@@ -1,19 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 :root {
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
   
-  /* Brand Colors based on "Luxury" aesthetic */
+  /* Brand Colors */
   --color-primary: #1a1a1a;
   --color-secondary: #f8f8f8;
-  --color-accent: #d4af37; /* Gold-ish */
+  --color-accent: #d4af37;
+  --color-sand: #f8f5f2;
+  
+  /* Animations */
+  --animate-marquee: marquee 25s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 25s linear infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @theme {
   --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  
   --color-primary: var(--color-primary);
   --color-secondary: var(--color-secondary);
   --color-accent: var(--color-accent);
+  --color-sand: var(--color-sand);
+  
+  --animate-marquee: var(--animate-marquee);
+  --animate-marquee-reverse: var(--animate-marquee-reverse);
+  --animate-pulse-slow: var(--animate-pulse-slow);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
 }
 
 body {
@@ -26,5 +51,14 @@ body {
 @layer utilities {
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

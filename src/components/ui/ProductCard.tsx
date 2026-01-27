@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore, Product } from '@/store/useCartStore';
 import { Button } from './Button';
 import { formatPrice } from '@/lib/utils';
-import { Star, Heart } from 'lucide-react';
+import { Star, Heart, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface ProductCardProps {
@@ -53,25 +53,25 @@ function CountdownTimer({ endTime }: { endTime: string }) {
 export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const toggleCart = useCartStore((state) => state.toggleCart);
+  const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = () => {
     addItem(product);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
     toggleCart();
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      className="group relative flex flex-col h-full"
-    >
+    <div className="group relative flex flex-col h-full">
       <div className="aspect-[3/4] overflow-hidden bg-gray-100 relative mb-4 rounded-sm">
         <img
           src={product.image}
           alt={product.name}
-          className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          loading="lazy"
+          width={400}
+          height={533}
+          className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110 will-change-transform"
         />
         
         {/* Badge */}
@@ -106,8 +106,37 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           ) : (
             <div className="p-4">
-              <Button onClick={handleAddToCart} className="w-full bg-black text-white hover:bg-gray-800 uppercase text-xs tracking-widest">
-                {product.customButtonText || 'Add to Cart'}
+              <Button 
+                onClick={handleAddToCart} 
+                disabled={isAdded}
+                className={`w-full uppercase text-xs tracking-widest transition-all duration-300 ${
+                  isAdded 
+                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                    : 'bg-black text-white hover:bg-gray-800'
+                }`}
+              >
+                <AnimatePresence mode="wait">
+                  {isAdded ? (
+                    <motion.span
+                      key="added"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Check className="w-4 h-4" /> Added
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="add"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      {product.customButtonText || 'Add to Cart'}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </Button>
             </div>
           )}
@@ -160,6 +189,6 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -8,6 +8,7 @@ import { SocialProofSection } from '@/components/home/SocialProofSection';
 import { StatsSection } from '@/components/home/StatsSection';
 import { CTASection } from '@/components/home/CTASection';
 import { FAQSection } from '@/components/home/FAQSection';
+import { GuaranteesBar } from '@/components/home/GuaranteesBar';
 import { StickyMobileCTA } from '@/components/ui/StickyMobileCTA';
 import { PRODUCTS } from '@/lib/data';
 import { Seo } from '@/components/seo/Seo';
@@ -16,10 +17,10 @@ export function Home() {
   const featured = PRODUCTS.slice(0, 6);
 
   return (
-    <div className="relative min-h-screen bg-white text-gray-900 selection:bg-[#d4af37]/30">
+    <div className="relative min-h-screen bg-white text-gray-900">
       <Seo
-        title="Scentiment — Premium Home Fragrance"
-        description="Premium home fragrance, made effortless. Explore diffusers, oils, room sprays, candles, and fine fragrance designed for modern spaces."
+        title="Scentiment — Premium Home Fragrance & Diffuser Oils"
+        description="Transform your space with premium home fragrance. Discover luxury diffusers, hotel-inspired oils, designer scents, and curated collections. Fast shipping, clean ingredients, expert support."
         canonicalPath="/"
         jsonLd={{
           '@context': 'https://schema.org',
@@ -35,6 +36,7 @@ export function Home() {
       <FeaturesSection />
       <UseCasesSection />
       <FeaturedProductsSection products={featured} />
+      <GuaranteesBar />
       <SocialProofSection />
       <StatsSection />
       <CTASection />

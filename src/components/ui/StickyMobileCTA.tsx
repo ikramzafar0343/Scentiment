@@ -27,7 +27,7 @@ export function StickyMobileCTA() {
             to="/shop" 
             className="block w-full bg-black text-white text-center py-4 font-bold uppercase tracking-widest text-sm shadow-xl rounded-sm"
           >
-            Shop Best Sellers
+            Shop Now
           </Link>
         </motion.div>
       )}

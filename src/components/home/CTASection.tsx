@@ -1,34 +1,40 @@
 import { HomeSection } from '@/components/home/HomeSection';
-import { AnimatedButton } from '@/components/ui/motion/AnimatedButton';
-import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export function CTASection() {
   return (
     <HomeSection
       id="cta"
-      eyebrow="Ready"
-      title="Make your space feel premium"
-      description="Start with best sellers or browse categories in a guided experience."
-      className="bg-gray-50"
+      eyebrow="Newsletter"
+      title="Get 10% off your first order"
+      description="Subscribe to receive exclusive offers, new arrivals, and fragrance tips delivered to your inbox."
+      className="newsletter-gradient"
     >
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 shadow-sm sm:p-10">
-        <div className="pointer-events-none absolute -top-20 right-10 h-64 w-64 rounded-full bg-[#d4af37]/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-sky-200/40 blur-3xl" />
-
-        <div className="relative grid grid-cols-1 gap-6 md:grid-cols-12 md:items-center">
-          <div className="md:col-span-8">
-            <div className="text-base font-semibold text-gray-900">Browse curated categories, clean ingredients, and premium packaging.</div>
-            <div className="mt-2 text-sm leading-relaxed text-gray-600">Fast shipping over $100, easy order tracking, and support that responds.</div>
-          </div>
-          <div className="md:col-span-4 md:flex md:justify-end">
-            <Link to="/shop" className="w-full md:w-auto">
-              <AnimatedButton className="w-full" size="lg">
-                Get Started <ArrowRight className="h-4 w-4" />
-              </AnimatedButton>
-            </Link>
-          </div>
-        </div>
+      <div className="max-w-2xl mx-auto text-center text-white">
+        <form 
+          className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const button = e.currentTarget.querySelector('button');
+            if (button) {
+              button.textContent = '✓ Subscribed!';
+              button.style.background = '#22c55e';
+            }
+          }}
+        >
+          <input
+            type="email"
+            placeholder="Enter your email address"
+            required
+            className="flex-1 px-5 py-3.5 border-none rounded-md text-base outline-none text-gray-900"
+          />
+          <button
+            type="submit"
+            className="px-7 py-3.5 bg-gradient-to-r from-[#1a1a1a] to-[#333] text-white border-none rounded-md font-semibold text-sm cursor-pointer transition-all duration-150 whitespace-nowrap hover:from-[#333] hover:to-[#4a4a4a] hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            Subscribe
+          </button>
+        </form>
+        <p className="text-sm opacity-80">🔒 No spam. Unsubscribe anytime with one click.</p>
       </div>
     </HomeSection>
   );

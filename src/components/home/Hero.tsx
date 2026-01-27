@@ -8,11 +8,11 @@ import { Tilt } from '@/components/ui/motion/Tilt';
 
 const HERO_COPY = {
   eyebrow: 'Scentiment',
-  headline: 'Premium home fragrance, made effortless.',
+  headline: 'Transform your space with premium home fragrance.',
   subtext:
-    'Discover curated diffuser oils and devices designed for modern spaces. Shop confidently with clean ingredients, fast shipping, and support that feels human.',
-  primaryCta: 'Browse Collection',
-  secondaryCta: 'Learn how it works'
+    'Discover luxury diffusers and hotel-inspired fragrance oils designed for modern living. Experience clean ingredients, fast shipping, and personalized support that makes fragrance effortless.',
+  primaryCta: 'Shop Collection',
+  secondaryCta: 'See how it works'
 };
 
 export function Hero() {
@@ -47,25 +47,24 @@ export function Hero() {
   }, [reduceMotion]);
 
   return (
-    <section aria-labelledby="home-hero" className="relative overflow-hidden bg-white">
+    <section aria-labelledby="home-hero" className="relative overflow-hidden hero-gradient">
       <div className="absolute inset-0">
-        <div className="absolute -top-24 left-1/2 h-72 w-[720px] -translate-x-1/2 rounded-full bg-gradient-to-r from-[#d4af37]/20 via-rose-200/30 to-sky-200/30 blur-3xl" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-gray-50" />
+        <div className="absolute inset-0 hero-pattern" />
       </div>
 
       <div className="relative">
         <div className="container-custom grid min-h-[680px] grid-cols-1 items-center gap-10 py-16 md:grid-cols-12 md:py-20">
           <motion.div style={{ opacity, y }} className="md:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-4 py-2 text-xs font-semibold tracking-widest text-gray-700 shadow-sm backdrop-blur">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 backdrop-blur-[10px] px-4 py-2 text-xs font-semibold tracking-widest text-white shadow-sm">
               <Sparkles className="h-4 w-4 text-[#d4af37]" />
               <span className="uppercase">{HERO_COPY.eyebrow}</span>
             </div>
 
-            <h1 id="home-hero" className="mt-5 max-w-xl text-4xl font-semibold leading-tight tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+            <h1 id="home-hero" className="mt-5 max-w-xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
               {HERO_COPY.headline}
             </h1>
 
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg">
               {HERO_COPY.subtext}
             </p>
 
@@ -73,8 +72,8 @@ export function Hero() {
               <Link
                 to="/shop"
                 className={cn(
-                  'group inline-flex h-12 items-center justify-center rounded-sm bg-gray-900 px-6 text-sm font-semibold text-white shadow-sm transition',
-                  'hover:bg-black hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2'
+                  'group inline-flex h-12 items-center justify-center rounded-md bg-gradient-to-r from-white to-gray-50 px-7 text-sm font-semibold text-[#0066cc] shadow-sm transition-all duration-150',
+                  'hover:from-gray-50 hover:to-gray-100 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
                 )}
               >
                 {HERO_COPY.primaryCta}
@@ -83,18 +82,23 @@ export function Hero() {
               <a
                 href="#how-it-works"
                 className={cn(
-                  'inline-flex h-12 items-center justify-center rounded-sm border border-gray-200 bg-white/70 px-6 text-sm font-semibold text-gray-900 backdrop-blur transition',
-                  'hover:bg-white hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2'
+                  'inline-flex h-12 items-center justify-center rounded-md border-2 border-white bg-transparent px-7 text-sm font-semibold text-white transition-all duration-150',
+                  'hover:bg-white hover:text-[#0066cc] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
                 )}
               >
                 {HERO_COPY.secondaryCta}
               </a>
             </div>
 
-            <div className="mt-8 grid max-w-xl grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-3">
-              <div className="rounded-sm border border-gray-100 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">Free shipping over $100</div>
-              <div className="rounded-sm border border-gray-100 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">Clean & safe ingredients</div>
-              <div className="rounded-sm border border-gray-100 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">5-star support</div>
+            <div className="mt-8 grid max-w-xl grid-cols-2 gap-4 text-sm sm:grid-cols-2">
+              <div className="rounded-lg border border-white/20 bg-white/10 backdrop-blur-[10px] px-6 py-6 text-center text-white shadow-sm">
+                <div className="text-2.5rem font-bold leading-none mb-2">$19<sup className="text-xl"></sup></div>
+                <div className="text-xs uppercase tracking-wider opacity-90">Fragrance Oils</div>
+              </div>
+              <div className="rounded-lg border border-white/20 bg-white/10 backdrop-blur-[10px] px-6 py-6 text-center text-white shadow-sm">
+                <div className="text-2.5rem font-bold leading-none mb-2">$40<sup className="text-xl"></sup></div>
+                <div className="text-xs uppercase tracking-wider opacity-90">Mini Diffusers</div>
+              </div>
             </div>
           </motion.div>
 
@@ -124,7 +128,7 @@ export function Hero() {
                     </video>
                     <img
                       src={sampleImage}
-                      alt="Premium fragrance"
+                      alt="Scentiment premium home fragrance diffuser and oils"
                       className={cn(
                         'relative h-full w-full object-cover transition-opacity duration-500',
                         !reduceMotion && visualInView ? 'opacity-0' : 'opacity-100'

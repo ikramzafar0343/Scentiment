@@ -20,8 +20,8 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
     const baseStyles = "relative inline-flex items-center justify-center rounded-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none uppercase tracking-widest overflow-hidden";
     
     const variants = {
-      primary: "bg-black text-white hover:bg-gray-900 border border-transparent",
-      secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 border border-transparent",
+      primary: "bg-gradient-to-r from-[#0066cc] to-[#20b2aa] text-white hover:from-[#0052a3] hover:to-[#1a9a94] border border-transparent",
+      secondary: "bg-gradient-to-r from-gray-100 to-gray-50 text-gray-900 hover:from-gray-200 hover:to-gray-100 border border-transparent",
       outline: "border border-gray-200 bg-transparent hover:border-black text-gray-900",
       ghost: "hover:bg-gray-100 hover:text-gray-900",
     };

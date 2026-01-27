@@ -17,8 +17,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'inline-flex items-center justify-center rounded-sm font-medium transition-[transform,box-shadow,background-color,color,border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:pointer-events-none disabled:opacity-50 uppercase tracking-widest will-change-transform',
           {
-            'bg-gray-900 text-white hover:bg-black hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)]': variant === 'primary',
-            'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.22)]': variant === 'secondary',
+            'bg-gradient-to-r from-[#0066cc] to-[#20b2aa] text-white hover:from-[#0052a3] hover:to-[#1a9a94] hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(0,102,204,0.4)]': variant === 'primary',
+            'bg-gradient-to-r from-white to-gray-50 text-gray-900 border border-gray-200 hover:from-gray-50 hover:to-gray-100 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.22)]': variant === 'secondary',
             'border border-gray-200 bg-white/60 backdrop-blur text-gray-900 hover:bg-white hover:-translate-y-0.5': variant === 'outline',
             'text-gray-900 hover:bg-gray-100': variant === 'ghost',
             'h-9 px-4 text-xs': size === 'sm',

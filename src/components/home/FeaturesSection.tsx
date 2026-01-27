@@ -4,12 +4,60 @@ import { Marquee } from '@/components/ui/motion/Marquee';
 import { BadgeCheck, HeartHandshake, Leaf, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 
 const FEATURES = [
-  { title: 'Premium, curated catalog', description: 'Hand-picked categories and edits that feel intentional and premium.', Icon: Sparkles },
-  { title: 'Clean ingredients', description: 'Formulated for a safer, better everyday experience.', Icon: Leaf },
-  { title: 'Fast shipping', description: 'Quick fulfillment with reliable tracking and careful packaging.', Icon: Truck },
-  { title: 'Trusted quality', description: 'Products designed to perform consistently and look great in your space.', Icon: BadgeCheck },
-  { title: 'Secure checkout', description: 'Confidence from browse to buy with clear policies and secure payments.', Icon: ShieldCheck },
-  { title: 'Real support', description: 'Responsive help that feels human, not ticket-driven.', Icon: HeartHandshake }
+  { 
+    title: 'Premium, curated catalog', 
+    description: 'Hand-picked categories and edits that feel intentional and premium.', 
+    Icon: Sparkles,
+    gradient: 'from-[#d4af37]/20 via-[#f4e4bc]/30 to-[#fff9e6]/40',
+    iconBg: 'bg-[#d4af37]/10',
+    iconColor: 'text-[#d4af37]',
+    iconEmoji: '🏆'
+  },
+  { 
+    title: 'Clean ingredients', 
+    description: 'Formulated for a safer, better everyday experience.', 
+    Icon: Leaf,
+    gradient: 'from-emerald-200/30 via-green-100/30 to-emerald-50/40',
+    iconBg: 'bg-emerald-200/20',
+    iconColor: 'text-emerald-600',
+    iconEmoji: '🌿'
+  },
+  { 
+    title: 'Fast shipping', 
+    description: 'Quick fulfillment with reliable tracking and careful packaging.', 
+    Icon: Truck,
+    gradient: 'from-red-200/30 via-rose-100/30 to-red-50/40',
+    iconBg: 'bg-red-200/20',
+    iconColor: 'text-red-600',
+    iconEmoji: '🚚'
+  },
+  { 
+    title: 'Trusted quality', 
+    description: 'Products designed to perform consistently and look great in your space.', 
+    Icon: BadgeCheck,
+    gradient: 'from-[#0066cc]/20 via-[#e6f2ff]/30 to-[#f0f7ff]/40',
+    iconBg: 'bg-[#0066cc]/10',
+    iconColor: 'text-[#0066cc]',
+    iconEmoji: '💯'
+  },
+  { 
+    title: 'Secure checkout', 
+    description: 'Confidence from browse to buy with clear policies and secure payments.', 
+    Icon: ShieldCheck,
+    gradient: 'from-purple-200/30 via-purple-100/30 to-purple-50/40',
+    iconBg: 'bg-purple-200/20',
+    iconColor: 'text-purple-600',
+    iconEmoji: '🔒'
+  },
+  { 
+    title: 'Real support', 
+    description: 'Responsive help that feels human, not ticket-driven.', 
+    Icon: HeartHandshake,
+    gradient: 'from-pink-200/30 via-pink-100/30 to-pink-50/40',
+    iconBg: 'bg-pink-200/20',
+    iconColor: 'text-pink-600',
+    iconEmoji: '❤️'
+  }
 ];
 
 const BANNERS = [
@@ -33,13 +81,13 @@ const BANNERS = [
   },
   {
     title: 'Designer-Grade Diffusion',
-    description: 'Clean throw • No guesswork',
+    description: 'Consistent performance • Reliable coverage',
     image:
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1200&auto=format&fit=crop'
   },
   {
-    title: 'Signature Scent Sets',
-    description: 'Build • Layer • Repeat',
+    title: 'Signature Scent Collections',
+    description: 'Mix • Layer • Customize',
     image:
       'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=1200&auto=format&fit=crop'
   }
@@ -49,22 +97,25 @@ export function FeaturesSection() {
   return (
     <HomeSection
       id="features"
-      eyebrow="Benefits"
-      title="Everything you need to buy with confidence"
-      description="Benefit-led design, premium products, and a smooth experience that converts."
+      eyebrow="Why Choose Us"
+      title="What makes Scentiment different"
+      description="Our commitment to quality, service, and your satisfaction"
       className="bg-white"
     >
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((f, idx) => (
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {FEATURES.slice(0, 4).map((f, idx) => (
           <FadeIn key={f.title} delay={0.04 * idx}>
-            <div className="group h-full rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 text-gray-900">
-                  <f.Icon className="h-5 w-5" />
-                </div>
-                <div className="text-base font-semibold text-gray-900">{f.title}</div>
+            <div className={`
+              group h-full rounded-xl border border-gray-200/50 p-6 text-left
+              bg-gradient-to-br ${f.gradient}
+              transition-all duration-300 
+              hover:-translate-y-1 hover:shadow-lg hover:border-gray-300
+            `}>
+              <div className={`flex h-12 w-12 items-center justify-center rounded-full ${f.iconBg} mb-4`}>
+                <span className="text-2xl">{f.iconEmoji}</span>
               </div>
-              <div className="mt-3 text-sm leading-relaxed text-gray-600">{f.description}</div>
+              <h4 className="text-base font-bold mb-2 text-gray-900">{f.title}</h4>
+              <p className="text-sm leading-relaxed text-gray-700">{f.description}</p>
             </div>
           </FadeIn>
         ))}

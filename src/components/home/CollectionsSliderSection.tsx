@@ -3,61 +3,44 @@ import { FadeIn } from '@/components/ui/motion/FadeIn';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import sampleImage from '@/assets/images/sample.png';
 
 const COLLECTIONS = [
-  { title: 'New Sale', to: '/sale', desc: 'Limited-time deals', image: sampleImage },
-  { title: 'Diffusers', to: '/diffusers', desc: 'Premium devices', image: sampleImage },
-  { title: 'Diffuser Oils', to: '/oils', desc: 'Clean, long-lasting', image: sampleImage },
-  { title: 'Scent Voyage', to: '/collection/voyage', desc: 'Travel-inspired edits', image: sampleImage },
-  { title: 'Room Sprays', to: '/sprays', desc: 'Instant refresh', image: sampleImage },
-  { title: 'Candles', to: '/candles', desc: 'Warm ambience', image: sampleImage },
-  { title: 'Perfumes', to: '/perfumes', desc: 'Signature scents', image: sampleImage }
+  { title: 'Diffusers', to: '/shop', desc: 'From $40 to $475 • Coverage 46m² to 600m²', icon: '💨' },
+  { title: 'Hotel Collection', to: '/shop', desc: 'Inspired by luxury hotels • Starting at $19', icon: '🏨' },
+  { title: 'Designer Collection', to: '/shop', desc: 'Inspired by designer fragrances • Starting at $19', icon: '✨' }
 ];
 
 export function CollectionsSliderSection() {
   return (
     <HomeSection
       id="collections"
-      eyebrow="Browse"
-      title="Shop by category"
-      description="Explore best-selling categories designed to upgrade your space and your routine."
-      className="bg-gray-50"
+      eyebrow="Collections"
+      title="Shop by Collection"
+      description="Discover curated fragrances for every space and mood"
+      className="bg-white"
     >
-      <div className="relative">
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-          {COLLECTIONS.map((item, idx) => (
-            <FadeIn key={item.title} delay={0.03 * idx}>
-              <Link
-                to={item.to}
-                className={cn(
-                  'group relative block h-[380px] w-[280px] shrink-0 snap-center overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition',
-                  'hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2'
-                )}
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-xl font-semibold text-white">{item.title}</div>
-                      <div className="mt-1 text-sm text-white/80">{item.desc}</div>
-                    </div>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition group-hover:bg-white/25">
-                      <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </FadeIn>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {COLLECTIONS.map((item, idx) => (
+          <FadeIn key={item.title} delay={0.03 * idx}>
+            <Link
+              to={item.to}
+              className={cn(
+                'group relative block aspect-square overflow-hidden rounded-2xl transition-all duration-300',
+                'bg-gradient-to-br from-[#e6f2ff] to-[#d4f4f1]',
+                'hover:-translate-y-2 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066cc] focus-visible:ring-offset-2'
+              )}
+            >
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+                <div className="text-5xl mb-4">{item.icon}</div>
+                <h3 className="text-xl font-bold mb-2 text-gray-900">{item.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">{item.desc}</p>
+                <span className="text-sm font-semibold text-[#0066cc] flex items-center gap-1">
+                  Explore Collection <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </div>
+            </Link>
+          </FadeIn>
+        ))}
       </div>
     </HomeSection>
   );

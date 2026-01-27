@@ -121,8 +121,8 @@ export function ProductCard({ product }: ProductCardProps) {
                 disabled={isAdded}
                 className={`w-full uppercase text-xs tracking-widest h-10 shadow-none transition-all duration-300 ${
                   isAdded 
-                    ? 'bg-green-600 hover:bg-green-700 text-white border-transparent' 
-                    : 'bg-black text-white hover:bg-gray-800 border-transparent'
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-transparent' 
+                    : 'bg-gradient-to-r from-[#0066cc] to-[#20b2aa] hover:from-[#0052a3] hover:to-[#1a9a94] text-white border-transparent'
                 }`}
               >
                 <AnimatePresence mode="wait">

@@ -68,7 +68,7 @@ function CountdownTimer() {
   }, []);
 
   return (
-    <div className="font-mono text-xl tracking-widest font-bold">
+    <div className="font-mono text-xl tracking-widest font-bold bg-gradient-to-r from-black via-[#d4af37] to-black bg-clip-text text-transparent">
       {String(time.h).padStart(2, '0')}h:{String(time.m).padStart(2, '0')}m:{String(time.s).padStart(2, '0')}s
     </div>
   );
@@ -117,45 +117,51 @@ export function Header() {
   return (
     <header className="fixed top-0 w-full z-50 flex flex-col" onMouseLeave={() => setActiveMenu(null)}>
       {/* Top Black Bar */}
-      <div className="bg-black/90 text-white py-2 relative z-[60] backdrop-blur-xl border-b border-white/10">
+      <div className="bg-white/80 backdrop-blur-md text-black py-2 relative z-[60] border-b border-gray-200/50">
         <div className="container-custom flex items-center gap-4">
           <div className="hidden md:block shrink-0">
             <CountdownTimer />
           </div>
-          <Marquee className="flex-1 text-[11px] tracking-[0.22em] uppercase text-white/80" speed={26}>
+          <Marquee className="flex-1 text-[11px] tracking-[0.22em] uppercase" speed={26}>
             <span className="inline-flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
-              Winter Event: extra 20% off
+              <span className="bg-gradient-to-r from-black via-[#d4af37] to-black bg-clip-text text-transparent font-semibold">
+                Winter Event: extra 20% off
+              </span>
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
-              Free shipping over €100
+              <span className="bg-gradient-to-r from-black via-[#20b2aa] to-black bg-clip-text text-transparent font-semibold">
+                Free shipping over €100
+              </span>
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
-              Limited drops weekly
+              <span className="bg-gradient-to-r from-black via-[#0066cc] to-black bg-clip-text text-transparent font-semibold">
+                Limited drops weekly
+              </span>
             </span>
           </Marquee>
 
           <div className="flex items-center gap-3 shrink-0">
-            <button className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Search">
-              <Search className="w-5 h-5" />
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Search">
+              <Search className="w-5 h-5 text-black" />
             </button>
             <button
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Account"
               onClick={() => setIsAccountOpen(true)}
             >
-              <User className="w-5 h-5" />
+              <User className="w-5 h-5 text-black" />
             </button>
             <button
-              className="p-2 hover:bg-white/10 rounded-full transition-colors relative"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
               onClick={toggleCart}
               aria-label="Open cart"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-5 h-5 text-black" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-white text-black text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0066cc] to-[#20b2aa] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg">
                   {totalItems}
                 </span>
               )}
@@ -186,7 +192,7 @@ export function Header() {
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-6 flex-1">
-            <Link to="/shop" className="bg-gray-900 text-white font-semibold px-6 py-2 rounded-sm text-sm hover:bg-black transition-colors uppercase whitespace-nowrap shadow-sm">
+            <Link to="/shop" className="bg-gradient-to-r from-[#0066cc] to-[#20b2aa] text-white font-semibold px-6 py-2 rounded-md text-sm hover:from-[#0052a3] hover:to-[#1a9a94] transition-all duration-150 uppercase whitespace-nowrap shadow-sm hover:-translate-y-0.5 hover:shadow-lg">
               SHOP NOW
             </Link>
             

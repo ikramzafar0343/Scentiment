@@ -1,17 +1,83 @@
-# React + Vite
+# Scentiment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern e-commerce application for luxury home fragrances and perfumes, built with React and Vite.
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework:** [React 19](https://react.dev/)
+- **Build Tool:** [Vite](https://vitejs.dev/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
+- **State Management:** [Zustand](https://github.com/pmndrs/zustand)
+- **Routing:** [React Router v7](https://reactrouter.com/)
+- **Icons:** [React Icons](https://react-icons.github.io/react-icons/) & [Lucide React](https://lucide.dev/)
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Responsive Design:** Fully responsive UI for desktop, tablet, and mobile.
+- **Dynamic Collections:**
+  - Diffusers
+  - Fragrance Oils
+  - Room Sprays
+  - Candles
+  - Perfumes
+- **Shopping Cart:** Persistent cart state management using Zustand.
+- **Product Filtering:** Category-based product filtering logic.
+- **Modern UI Components:** Custom-built components for Product Cards, Mega Menus, and Layouts.
 
-## Expanding the ESLint configuration
+## 🛠️ Installation & Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-"# Scentiment" 
+1.  **Clone the repository**
+    ```bash
+    git clone <repository-url>
+    cd scentiment
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server**
+    ```bash
+    npm run dev
+    ```
+
+4.  **Build for production**
+    ```bash
+    npm run build
+    ```
+
+## 📦 Deployment
+
+This project is configured for deployment on [Render](https://render.com/).
+
+### Render Configuration (`render.yaml`)
+A `render.yaml` file is included to automate the deployment process.
+
+- **Service Type:** Static Site
+- **Build Command:** `npm install && npm run build`
+- **Publish Directory:** `dist`
+- **Routing:** Rewrites all routes to `index.html` (SPA support)
+
+To deploy:
+1.  Push your code to a Git repository (GitHub/GitLab).
+2.  Connect your repository to Render.
+3.  Render will automatically detect the `render.yaml` blueprint.
+
+## 📂 Project Structure
+
+```
+src/
+├── components/     # Reusable UI components (Layout, UI, etc.)
+├── lib/           # Utilities and static data (data.ts)
+├── pages/         # Route components (Home, Shop, NewArrivals, etc.)
+├── store/         # Global state management (Zustand stores)
+├── App.tsx        # Main application component & Routing
+└── main.tsx       # Entry point
+```
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).

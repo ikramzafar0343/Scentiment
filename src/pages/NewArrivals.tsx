@@ -1,216 +1,287 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { PRODUCTS } from '@/lib/data';
 import { ProductCard } from '@/components/ui/ProductCard';
-import { Plus, Minus, Filter } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
-
-const FAQS = [
-  {
-    question: "How long do the scents last?",
-    answer: "Our fragrances are formulated to last up to 30 days with average use. The intensity can be adjusted on your diffuser device."
-  },
-  {
-    question: "Are the fragrances pet safe?",
-    answer: "Yes, all our fragrances are IFRA compliant and safe for pets and children when used as directed."
-  },
-  {
-    question: "Can I return the product if I don't like the scent?",
-    answer: "We offer a 30-day money-back guarantee on all our products. If you're not satisfied, simply return it for a full refund."
-  },
-  {
-    question: "Do you ship internationally?",
-    answer: "Yes, we ship to over 50 countries worldwide. Shipping times may vary based on location."
-  }
-];
+import { FilterSidebar } from '@/components/shop/FilterSidebar';
+import { SortDropdown } from '@/components/shop/SortDropdown';
+import { FeaturesSection } from '@/components/home/FeaturesSection';
+import { NewsletterSection } from '@/components/home/NewsletterSection';
+import { FAQSection } from '@/components/home/FAQSection';
+import { Button } from '@/components/ui/Button';
+import { SlidersHorizontal } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Seo } from '@/components/seo/Seo';
 
 export function NewArrivals() {
-  const [showFilters, setShowFilters] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const location = useLocation();
-  const isSalePage = location.pathname.includes('sale') || location.pathname.includes('specials');
-  const isDiffuserPage = location.pathname.includes('diffusers') || location.pathname.includes('scent-diffusers');
-  const isOilsPage = location.pathname.includes('oils') || location.pathname.includes('fragrance-oils');
-  const isRoomSpraysPage = location.pathname.includes('sprays') || location.pathname.includes('fragrance-room-sprays');
-  const isCandlesPage = location.pathname.includes('candles');
-  const isPerfumesPage = location.pathname.includes('perfumes') || location.pathname.includes('fragrances');
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
+  const [sortBy, setSortBy] = useState('featured');
+  
+  // Determine Page Context
+  const context = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes('sale') || path.includes('specials')) return 'sale';
+    if (path.includes('diffusers') || path.includes('scent-diffusers')) return 'diffusers';
+    if (path.includes('oils') || path.includes('fragrance-oils')) return 'oils';
+    if (path.includes('sprays') || path.includes('fragrance-room-sprays')) return 'sprays';
+    if (path.includes('candles')) return 'candles';
+    if (path.includes('perfumes') || path.includes('fragrances')) return 'perfumes';
+    return 'new';
+  }, [location.pathname]);
 
-  let pageTitle = "New Arrivals";
-  let subTitle = "Latest Drops";
-  let pageDescription = "Discover the latest additions to our luxury fragrance collection. Crafted to transform your space.";
+  // Page Content Config
+  const pageConfig = {
+    new: {
+      title: "New Arrivals",
+      subtitle: "Latest Drops",
+      description: "Discover the latest additions to our luxury fragrance collection. Crafted to transform your space.",
+      filterCategory: null // Show all, but maybe highlight new?
+    },
+    sale: {
+      title: "Specials",
+      subtitle: "Limited Time Offers",
+      description: "Exclusive deals on our premium diffusers and fragrances. Limited time only.",
+      filterCategory: null
+    },
+    diffusers: {
+      title: "Scent Diffusers",
+      subtitle: "Latest Drops",
+      description: "Elevate your environment with our state-of-the-art cold-air diffusion technology.",
+      filterCategory: 'Diffusers'
+    },
+    oils: {
+      title: "Fragrance Oils",
+      subtitle: "Best Sellers",
+      description: "100% Pure Fragrance Oils for Scent Diffusers. Safe for Pets & Kids.",
+      filterCategory: 'Fragrance Oils'
+    },
+    sprays: {
+      title: "Room Sprays",
+      subtitle: "Instant Freshness",
+      description: "Transform your space instantly with our luxury room sprays. Inspired by world-class hotels.",
+      filterCategory: 'Room Sprays'
+    },
+    candles: {
+      title: "Candles",
+      subtitle: "Set The Mood",
+      description: "Hand-poured luxury candles featuring our signature hotel-inspired scents.",
+      filterCategory: 'Candles'
+    },
+    perfumes: {
+      title: "Perfumes & Cologne",
+      subtitle: "Signature Scents",
+      description: "Discover our collection of luxury perfumes and colognes. Inspired by iconic designer fragrances.",
+      filterCategory: 'Perfumes'
+    }
+  }[context];
 
-  if (isSalePage) {
-    pageTitle = "Specials";
-    subTitle = "Limited Time Offers";
-    pageDescription = "Exclusive deals on our premium diffusers and fragrances. Limited time only.";
-  } else if (isDiffuserPage) {
-    pageTitle = "Scent Diffusers";
-    subTitle = "Latest Drops";
-    pageDescription = "Elevate your environment with our state-of-the-art cold-air diffusion technology. Safe, clean, and consistent scenting for any space.";
-  } else if (isOilsPage) {
-    pageTitle = "Fragrance Oils";
-    subTitle = "Best Sellers";
-    pageDescription = "100% Pure Fragrance Oils for Scent Diffusers. Safe for Pets & Kids.";
-  } else if (isRoomSpraysPage) {
-    pageTitle = "Room Sprays";
-    subTitle = "Instant Freshness";
-    pageDescription = "Transform your space instantly with our luxury room sprays. Inspired by world-class hotels and resorts.";
-  } else if (isCandlesPage) {
-    pageTitle = "Candles";
-    subTitle = "Set The Mood";
-    pageDescription = "Hand-poured luxury candles featuring our signature hotel-inspired scents. Long-lasting burn with premium soy wax.";
-  } else if (isPerfumesPage) {
-    pageTitle = "Perfumes & Cologne";
-    subTitle = "Signature Scents";
-    pageDescription = "Discover our collection of luxury perfumes and colognes. Inspired by iconic designer fragrances.";
-  }
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    pageConfig.filterCategory || 'All Products'
+  );
 
-  const displayProducts = isDiffuserPage 
-    ? PRODUCTS.filter(p => p.category === 'Diffusers')
-    : isOilsPage
-      ? PRODUCTS.filter(p => p.category === 'Fragrance Oils')
-      : isRoomSpraysPage
-        ? PRODUCTS.filter(p => p.category === 'Room Sprays')
-        : isCandlesPage
-          ? PRODUCTS.filter(p => p.category === 'Candles')
-          : isPerfumesPage
-            ? PRODUCTS.filter(p => p.category === 'Perfumes')
-            : [...PRODUCTS, ...PRODUCTS];
+  // Available Categories (Unique from Products)
+  const categories = useMemo(() => {
+    return Array.from(new Set(PRODUCTS.map(p => p.category)));
+  }, []);
+
+  // Filter Logic
+  const filteredProducts = useMemo(() => {
+    let result = [...PRODUCTS];
+
+    // 1. Context Filtering (Base Filter)
+    if (context === 'sale') {
+      result = result.filter(p => p.badge?.includes('OFF') || p.badge === 'SALE');
+    } else if (context === 'new') {
+      result = result.filter(p => p.isNew);
+    } else if (pageConfig.filterCategory) {
+      result = result.filter(p => p.category === pageConfig.filterCategory);
+    }
+    
+    // 2. Sidebar Filtering (User Filter)
+    // If the page has a fixed category (e.g. Diffusers page), we might want to ignore the "All Products" selection 
+    // or treat "All Products" as "All Diffusers".
+    // However, to keep it simple: if the user explicitly selects a different category in the sidebar, we respect it 
+    // (allowing cross-browsing) OR we could hide the category filter on specific pages.
+    // Let's allow filtering if 'All Products' is not selected, otherwise adhere to page context.
+    
+    if (selectedCategory !== 'All Products' && selectedCategory !== pageConfig.filterCategory) {
+       result = result.filter(p => p.category === selectedCategory);
+    }
+
+    // 3. Price Filter
+    result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+
+    // 4. Sort
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'newest':
+        result = result.reverse(); 
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [context, pageConfig.filterCategory, selectedCategory, priceRange, sortBy]);
 
   return (
-    <div className="container-custom py-8 md:py-12">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <span className="text-[#d4af37] font-bold tracking-widest uppercase text-xs md:text-sm mb-2 block">{subTitle}</span>
-        <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-widest mb-4">{pageTitle}</h1>
-        <p className="text-gray-500 max-w-2xl mx-auto">
-          {pageDescription}
-        </p>
+    <div className="bg-white min-h-screen">
+      <Seo
+        title={
+          context === 'sale'
+            ? 'Sale — Scentiment'
+            : context === 'diffusers'
+              ? 'Diffusers — Scentiment'
+              : context === 'oils'
+                ? 'Fragrance Oils — Scentiment'
+                : context === 'sprays'
+                  ? 'Room Sprays — Scentiment'
+                  : context === 'candles'
+                    ? 'Candles — Scentiment'
+                    : context === 'perfumes'
+                      ? 'Perfumes — Scentiment'
+                      : 'New Arrivals — Scentiment'
+        }
+        description={pageConfig.description}
+      />
+      {/* Hero Section */}
+      <div className="relative bg-[#f8f5f2] py-16 lg:py-20 overflow-hidden">
+        <div className="container-custom relative z-10 text-center px-4">
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.6 }}
+           >
+              <span className="text-[#d4af37] font-bold tracking-widest uppercase text-xs md:text-sm mb-3 block">
+                {pageConfig.subtitle}
+              </span>
+              <h1 className="text-4xl md:text-6xl font-serif font-medium mb-6 text-gray-900">
+                {pageConfig.title}
+              </h1>
+              <p className="max-w-xl mx-auto text-gray-600 text-lg font-light leading-relaxed">
+                {pageConfig.description}
+              </p>
+           </motion.div>
+        </div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-white/50 pointer-events-none" />
       </div>
-      
-      <div className="flex flex-col lg:flex-row gap-12">
-        {/* Mobile Filter Toggle */}
-        <button 
-          className="lg:hidden flex items-center justify-between border-y border-gray-200 py-4 font-bold uppercase tracking-wide"
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          <span>Filters</span>
-          <Filter className="w-4 h-4" />
-        </button>
 
-        {/* Filters Sidebar */}
-        <aside className={`w-full lg:w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-           <div className="sticky top-24 space-y-8 pr-4">
-             {/* Categories */}
-             <div className="border-b border-gray-100 pb-6">
-               <h3 className="font-bold mb-4 uppercase text-sm tracking-wide">Category</h3>
-               <ul className="space-y-3 text-sm text-gray-600">
-                 <li className={`cursor-pointer transition-colors ${!isDiffuserPage && !isOilsPage && !isRoomSpraysPage ? 'font-medium text-black' : 'hover:text-black'}`}>All New Arrivals</li>
-                 <li className={`cursor-pointer transition-colors ${isDiffuserPage ? 'font-medium text-black' : 'hover:text-black'}`}>Diffusers</li>
-                 <li className={`cursor-pointer transition-colors ${isOilsPage ? 'font-medium text-black' : 'hover:text-black'}`}>Fragrance Oils</li>
-                 <li className={`cursor-pointer transition-colors ${isRoomSpraysPage ? 'font-medium text-black' : 'hover:text-black'}`}>Room Sprays</li>
-                 <li className={`cursor-pointer transition-colors ${isCandlesPage ? 'font-medium text-black' : 'hover:text-black'}`}>Candles</li>
-                 <li className={`cursor-pointer transition-colors ${isPerfumesPage ? 'font-medium text-black' : 'hover:text-black'}`}>Perfumes</li>
-                 <li className="hover:text-black cursor-pointer transition-colors">Gift Sets</li>
-               </ul>
-             </div>
+      <div className="container-custom py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Filters Sidebar */}
+          <FilterSidebar 
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            priceRange={priceRange}
+            onPriceChange={setPriceRange}
+            isOpenMobile={isMobileFilterOpen}
+            onCloseMobile={() => setIsMobileFilterOpen(false)}
+            className="lg:sticky lg:top-24 h-fit"
+          />
 
-             {/* Price Range */}
-             <div className="border-b border-gray-100 pb-6">
-               <h3 className="font-bold mb-4 uppercase text-sm tracking-wide">Price</h3>
-               <div className="space-y-3">
-                 <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-black">
-                   <input type="checkbox" className="rounded border-gray-300" />
-                   Under $50
-                 </label>
-                 <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-black">
-                   <input type="checkbox" className="rounded border-gray-300" />
-                   $50 - $100
-                 </label>
-                 <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-black">
-                   <input type="checkbox" className="rounded border-gray-300" />
-                   $100 - $200
-                 </label>
-                 <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-black">
-                   <input type="checkbox" className="rounded border-gray-300" />
-                   $200+
-                 </label>
-               </div>
-             </div>
-
-             {/* Scent Profile */}
-             <div className="pb-6">
-               <h3 className="font-bold mb-4 uppercase text-sm tracking-wide">Scent Family</h3>
-               <ul className="space-y-3 text-sm text-gray-600">
-                 <li className="hover:text-black cursor-pointer transition-colors">Woody & Earthy</li>
-                 <li className="hover:text-black cursor-pointer transition-colors">Fresh & Clean</li>
-                 <li className="hover:text-black cursor-pointer transition-colors">Floral</li>
-                 <li className="hover:text-black cursor-pointer transition-colors">Citrus</li>
-               </ul>
-             </div>
-           </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1">
-          {/* Toolbar */}
-          <div className="flex justify-between items-center mb-6 text-sm text-gray-500">
-            <p>{displayProducts.length} Products</p>
-            <div className="flex items-center gap-2">
-              <span>Sort by:</span>
-              <select className="border-none bg-transparent font-medium text-black focus:ring-0 cursor-pointer outline-none">
-                <option>Newest</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Best Selling</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 mb-20">
-            {displayProducts.map((product, i) => (
-              <ProductCard key={`${product.id}-${i}`} product={product} />
-            ))}
-          </div>
-
-          {/* FAQ Section */}
-          <section className="border-t border-gray-200 pt-16">
-            <h2 className="text-2xl font-bold mb-8 text-center uppercase tracking-widest">Frequently Asked Questions</h2>
-            <div className="max-w-3xl mx-auto space-y-4">
-              {FAQS.map((faq, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                    className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
-                  >
-                    <span className="font-medium">{faq.question}</span>
-                    {openFaq === index ? (
-                      <Minus className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <Plus className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
-                  <AnimatePresence>
-                    {openFaq === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="p-4 pt-0 text-gray-600 text-sm leading-relaxed border-t border-gray-100 bg-gray-50/50">
-                          {faq.answer}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+          <main className="flex-1">
+             {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 sticky top-20 z-30 bg-white/90 backdrop-blur-md py-4 sm:py-2 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-gray-100 sm:border-none">
+              <div className="text-sm text-gray-500">
+                Showing <span className="font-bold text-black">{filteredProducts.length}</span> results
+              </div>
+              
+              <div className="flex items-center gap-4 w-full sm:w-auto">
+                <Button 
+                  variant="outline" 
+                  className="lg:hidden flex-1 flex items-center gap-2"
+                  onClick={() => setIsMobileFilterOpen(true)}
+                >
+                  <SlidersHorizontal className="w-4 h-4" /> Filters
+                </Button>
+                
+                <div className="flex-1 sm:flex-none flex justify-end">
+                   <SortDropdown sortBy={sortBy} onSortChange={setSortBy} />
                 </div>
-              ))}
+              </div>
             </div>
-          </section>
-        </main>
+
+            {/* Product Grid */}
+            {filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+                {filteredProducts.map((product, i) => (
+                  <motion.div
+                    key={`${product.id}-${i}`}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-10%' }}
+                    transition={{ duration: 0.55, delay: Math.min(i * 0.04, 0.2), ease: [0.21, 0.47, 0.32, 0.98] }}
+                  >
+                    <ProductCard 
+                      product={{
+                        ...product,
+                        badge: context === 'new' && !product.badge ? 'NEW' : product.badge
+                      }} 
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-gray-50 rounded-lg">
+                <p className="text-gray-500 mb-4">No products found matching your criteria.</p>
+                <Button 
+                  onClick={() => {
+                    setSelectedCategory('All Products');
+                    setPriceRange([0, 200]);
+                  }}
+                  variant="outline"
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
+
+      {/* Featured Section (for New Arrivals) */}
+      {context === 'new' && (
+        <section className="py-16 bg-black text-white overflow-hidden">
+          <div className="container-custom">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="order-2 md:order-1">
+                <span className="text-[#d4af37] font-bold tracking-widest uppercase text-xs mb-4 block">Featured Launch</span>
+                <h2 className="text-3xl md:text-5xl font-serif font-medium mb-6">The Hotel Collection</h2>
+                <p className="text-gray-300 text-lg leading-relaxed mb-8">
+                  Bring the essence of 5-star luxury into your home. Our newest collection features scents inspired by the world's most iconic hotels.
+                </p>
+                <Button variant="secondary" className="bg-white text-black hover:bg-gray-200">
+                  Shop The Collection
+                </Button>
+              </div>
+              <div className="order-1 md:order-2 relative">
+                 <div className="aspect-square bg-white/10 rounded-full blur-3xl absolute inset-0 transform scale-75" />
+                 <img 
+                   src="https://images.unsplash.com/photo-1605656816944-971cd5c1407f?q=80&w=800&auto=format&fit=crop" 
+                   alt="Featured Collection" 
+                   className="relative z-10 rounded-sm shadow-2xl transform md:rotate-3 hover:rotate-0 transition-transform duration-700"
+                 />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Why Choose Us */}
+      <FeaturesSection />
+
+      {/* FAQ */}
+      <FAQSection />
+
+      {/* Newsletter */}
+      <NewsletterSection />
     </div>
   );
 }

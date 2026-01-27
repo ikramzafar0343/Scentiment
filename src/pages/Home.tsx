@@ -9,14 +9,26 @@ import { StatsSection } from '@/components/home/StatsSection';
 import { CTASection } from '@/components/home/CTASection';
 import { FAQSection } from '@/components/home/FAQSection';
 import { StickyMobileCTA } from '@/components/ui/StickyMobileCTA';
-import { PageTransition } from '@/components/ui/motion/PageTransition';
 import { PRODUCTS } from '@/lib/data';
+import { Seo } from '@/components/seo/Seo';
 
 export function Home() {
   const featured = PRODUCTS.slice(0, 6);
 
   return (
-    <PageTransition className="relative min-h-screen bg-white text-gray-900 selection:bg-[#d4af37]/30">
+    <div className="relative min-h-screen bg-white text-gray-900 selection:bg-[#d4af37]/30">
+      <Seo
+        title="Scentiment — Premium Home Fragrance"
+        description="Premium home fragrance, made effortless. Explore diffusers, oils, room sprays, candles, and fine fragrance designed for modern spaces."
+        canonicalPath="/"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: 'Scentiment',
+          url: '/',
+          sameAs: []
+        }}
+      />
       <Hero />
       <HowItWorksSection />
       <CollectionsSliderSection />
@@ -28,6 +40,6 @@ export function Home() {
       <CTASection />
       <FAQSection />
       <StickyMobileCTA />
-    </PageTransition>
+    </div>
   );
 }

@@ -1,10 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Search, User, AlertTriangle } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/store/useCartStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SAMPLE_PRODUCT_IMAGE } from '@/lib/data';
+import { Marquee } from '@/components/ui/motion/Marquee';
+
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
+      <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.658 29.273 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.155 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917Z" />
+      <path fill="#FF3D00" d="M6.306 14.691 12.841 19.48C14.608 15.108 18.884 12 24 12c3.059 0 5.842 1.155 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4c-7.682 0-14.354 4.33-17.694 10.691Z" />
+      <path fill="#4CAF50" d="M24 44c5.165 0 9.86-1.977 13.409-5.195l-6.19-5.238C29.219 35.091 26.715 36 24 36c-5.252 0-9.62-3.317-11.283-7.946l-6.49 5.002C9.543 39.556 16.227 44 24 44Z" />
+      <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.03 12.03 0 0 1-4.084 5.567l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917Z" />
+    </svg>
+  );
+}
 
 const NAV_LINKS = [
   { name: 'Shop All', href: '/shop' },
@@ -66,6 +78,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const totalItems = useCartStore((state) => state.totalItems());
   const toggleCart = useCartStore((state) => state.toggleCart);
 
@@ -77,50 +90,83 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isAccountOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsAccountOpen(false);
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isAccountOpen]);
+
+  const handleGoogleSignIn = () => {
+    const googleAuthUrl = (import.meta.env as Record<string, string | undefined>)[
+      'VITE_GOOGLE_AUTH_URL'
+    ];
+    window.location.assign(googleAuthUrl ?? '/auth/google');
+  };
+
   return (
     <header className="fixed top-0 w-full z-50 flex flex-col" onMouseLeave={() => setActiveMenu(null)}>
       {/* Top Black Bar */}
-      <div className="bg-black text-white py-2 px-4 flex items-center justify-between text-xs sm:text-sm relative z-50">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="flex items-center gap-2 font-bold text-yellow-400 whitespace-nowrap">
-            <AlertTriangle className="w-4 h-4 fill-yellow-400 text-black" />
-            <span className="text-white">SNOW STORM WARNING!</span>
-            <span className="text-white">EXTRA 20% OFF EVERYTHING‼️</span>
-          </div>
-          <button className="bg-white text-black font-bold px-4 py-1 rounded text-xs hover:bg-gray-200 transition-colors hidden sm:block">
-            SHOP NOW
-          </button>
-          <div className="hidden md:block ml-4">
+      <div className="bg-black/90 text-white py-2 relative z-[60] backdrop-blur-xl border-b border-white/10">
+        <div className="container-custom flex items-center gap-4">
+          <div className="hidden md:block shrink-0">
             <CountdownTimer />
           </div>
-        </div>
+          <Marquee className="flex-1 text-[11px] tracking-[0.22em] uppercase text-white/80" speed={26}>
+            <span className="inline-flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
+              Winter Event: extra 20% off
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
+              Free shipping over €100
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
+              Limited drops weekly
+            </span>
+          </Marquee>
 
-        <div className="flex items-center gap-4">
-          <button className="text-2xl" aria-label="US Flag">🇺🇸</button>
-          <button className="p-1 hover:text-gray-300 transition-colors" aria-label="Search">
-            <Search className="w-5 h-5" />
-          </button>
-          <button className="p-1 hover:text-gray-300 transition-colors" aria-label="Account">
-            <User className="w-5 h-5" />
-          </button>
-          <button
-            className="p-1 hover:text-gray-300 transition-colors relative"
-            onClick={toggleCart}
-            aria-label="Open cart"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-white text-black text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                {totalItems}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <button className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Search">
+              <Search className="w-5 h-5" />
+            </button>
+            <button
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              aria-label="Account"
+              onClick={() => setIsAccountOpen(true)}
+            >
+              <User className="w-5 h-5" />
+            </button>
+            <button
+              className="p-2 hover:bg-white/10 rounded-full transition-colors relative"
+              onClick={toggleCart}
+              aria-label="Open cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-black text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Navigation */}
       <div className={cn(
-        'bg-white transition-all duration-300 border-b border-gray-100 relative z-40',
+        'bg-white/90 backdrop-blur-xl transition-all duration-300 border-b border-black/5 relative z-[50]',
         isScrolled ? 'shadow-sm py-2' : 'py-4'
       )}>
         <div className="container-custom flex items-center gap-8">
@@ -134,13 +180,13 @@ export function Header() {
           </button>
 
           {/* Logo */}
-          <Link to="/" className="text-3xl font-serif italic font-bold text-black shrink-0 mr-4" style={{ fontFamily: 'cursive' }}>
+          <Link to="/" className="text-3xl font-serif font-semibold tracking-tight text-black shrink-0 mr-4">
             Scentiment
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-6 flex-1">
-            <Link to="/shop" className="bg-gray-200 text-black font-bold px-6 py-2 rounded text-sm hover:bg-gray-300 transition-colors uppercase whitespace-nowrap">
+            <Link to="/shop" className="bg-gray-900 text-white font-semibold px-6 py-2 rounded-sm text-sm hover:bg-black transition-colors uppercase whitespace-nowrap shadow-sm">
               SHOP NOW
             </Link>
             
@@ -607,6 +653,58 @@ export function Header() {
                 ))}
               </div>
             </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isAccountOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[70] bg-black/35 backdrop-blur-sm"
+              onClick={() => setIsAccountOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 260 }}
+              className="fixed right-0 top-0 z-[80] h-dvh w-full max-w-md bg-white shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Sign in"
+            >
+              <div className="flex items-center justify-between px-6 py-5 border-b border-black/10">
+                <h2 className="text-[13px] font-extrabold tracking-[0.22em] uppercase text-black">
+                  Sign in or create account
+                </h2>
+                <button
+                  className="p-2 rounded-full hover:bg-black/5 transition-colors"
+                  aria-label="Close"
+                  onClick={() => setIsAccountOpen(false)}
+                >
+                  <X className="w-5 h-5 text-black" />
+                </button>
+              </div>
+
+              <div className="px-6 py-6">
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  className="w-full rounded-sm border border-black/15 bg-white px-4 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-black hover:bg-black/5 transition-colors flex items-center justify-center gap-3"
+                >
+                  <GoogleIcon className="h-5 w-5" />
+                  <span>Sign in with Google</span>
+                </button>
+
+                <p className="mt-5 text-[11px] leading-relaxed text-black/60">
+                  By clicking Continue you agree to our Privacy Policy and Terms &amp; Conditions.
+                </p>
+              </div>
+            </motion.aside>
           </>
         )}
       </AnimatePresence>

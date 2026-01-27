@@ -723,6 +723,7 @@ export const PRODUCTS = [
     reviews: 550,
     badge: '52% OFF',
     saveAmount: 26,
+    isNew: true,
     customButtonText: 'Add to Cart',
     flashSale: {
       code: 'STORM',

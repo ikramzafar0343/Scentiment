@@ -1,460 +1,451 @@
-import { useRef } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, Heart, ChevronLeft, ChevronRight, BarChart2, Info } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ProductCard } from '@/components/ui/ProductCard';
+import { FilterSidebar } from '@/components/shop/FilterSidebar';
+import { SortDropdown } from '@/components/shop/SortDropdown';
+import { FeaturesSection } from '@/components/home/FeaturesSection';
+import { NewsletterSection } from '@/components/home/NewsletterSection';
+import { FAQSection } from '@/components/home/FAQSection';
 import { Button } from '@/components/ui/Button';
+import { SlidersHorizontal, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Product } from '@/store/useCartStore';
+import { Seo } from '@/components/seo/Seo';
 
-// Mock Data for the Voyage Collection Carousel
-const VOYAGE_COLLECTION = [
+// Adapted Mock Data for Voyage Collection
+const VOYAGE_PRODUCTS: (Product & { 
+  originalPrice?: number;
+  description?: string;
+  rating?: number;
+  reviews?: number;
+  badge?: string;
+  saveAmount?: number;
+  customButtonText?: string;
+  inspiredBy?: string; 
+  scents?: string;
+  variants?: string[];
+  destinationTag?: string; // For filtering by visual tags
+})[] = [
+  // Discovery Sets
   {
     id: 'miami-discovery',
     name: 'Miami Hotel Discovery Set',
-    inspiredBy: 'Inspired by 1 Hotel® Miami Beach, Delano® Beach Club, Confidante Hotel',
-    scents: 'The One, Hot Miami, Ocean Views',
     price: 34.16,
     originalPrice: 51.25,
-    discount: '33% OFF',
+    category: 'Discovery Sets',
     image: 'https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&q=80&w=600&h=600',
-    bottleImage: 'https://images.unsplash.com/photo-1594035910387-fea477942698?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    type: 'set'
+    description: 'Inspired by 1 Hotel® Miami Beach, Delano® Beach Club. Scents: The One, Hot Miami, Ocean Views.',
+    rating: 5,
+    reviews: 12,
+    badge: '33% OFF',
+    saveAmount: 17.09,
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Miami Hotels',
+    scents: 'The One, Hot Miami, Ocean Views',
+    destinationTag: 'Miami'
   },
   {
     id: 'coastal-discovery',
     name: 'Coastal Hotel Discovery Set',
-    inspiredBy: 'Inspired by Soneva Jani Maldives, Eden Rock St. Barths, Montage Laguna Beach & more',
-    scents: 'Maldives, St. Barths, The Laguna Hotel & more',
     price: 34.16,
     originalPrice: 51.25,
-    discount: '33% OFF',
+    category: 'Discovery Sets',
     image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&q=80&w=600&h=600',
-    bottleImage: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    hasTopToggle: true,
-    type: 'set'
+    description: 'Inspired by Soneva Jani Maldives, Eden Rock St. Barths. Scents: Maldives, St. Barths.',
+    rating: 5,
+    reviews: 8,
+    badge: '33% OFF',
+    saveAmount: 17.09,
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Coastal Resorts',
+    scents: 'Maldives, St. Barths',
+    destinationTag: 'Coastal'
   },
   {
     id: 'paris-discovery',
     name: 'Paris Hotel Discovery Set',
-    inspiredBy: 'Inspired by Hotel Costes®, Ritz-Carlton® Paris, Le Bristol Paris',
-    scents: 'French Hotel, Vendôme, Crown Jewel',
     price: 34.16,
     originalPrice: 51.25,
-    discount: '33% OFF',
+    category: 'Discovery Sets',
     image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=600&h=600',
-    bottleImage: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    type: 'set'
+    description: 'Inspired by Hotel Costes®, Ritz-Carlton® Paris. Scents: French Hotel, Vendôme.',
+    rating: 5,
+    reviews: 15,
+    badge: '33% OFF',
+    saveAmount: 17.09,
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Parisian Hotels',
+    scents: 'French Hotel, Vendôme',
+    destinationTag: 'Paris'
   },
   {
     id: 'mediterranean-discovery',
     name: 'Mediterranean Hotel Discovery Set',
-    inspiredBy: 'Inspired by Santa Caterina Hotel, Hotel de Paris Monte-Carlo, Carlton Cannes, a Regent Hotel and more',
-    scents: 'Amalfi Breeze, Monte Carlo, Côte d\'Azur & more',
     price: 34.16,
     originalPrice: 51.25,
-    discount: '33% OFF',
+    category: 'Discovery Sets',
     image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&q=80&w=600&h=600',
-    bottleImage: 'https://images.unsplash.com/photo-1523293188086-b589b9e5aadf?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    type: 'set'
+    description: 'Inspired by Santa Caterina Hotel, Hotel de Paris. Scents: Amalfi Breeze, Monte Carlo.',
+    rating: 5,
+    reviews: 10,
+    badge: '33% OFF',
+    saveAmount: 17.09,
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Mediterranean Hotels',
+    scents: 'Amalfi Breeze, Monte Carlo',
+    destinationTag: 'Mediterranean'
   },
   {
     id: 'london-discovery',
     name: 'London Hotel Discovery Set',
-    inspiredBy: 'Inspired by The Connaught, The Lanesborough, Rosewood London and more',
-    scents: 'Royal Hall, Hyde Park, Tea Room & more',
     price: 34.16,
     originalPrice: 51.25,
-    discount: '33% OFF',
+    category: 'Discovery Sets',
     image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=600&h=600',
-    bottleImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    type: 'set'
+    description: 'Inspired by The Connaught, The Lanesborough. Scents: Royal Hall, Hyde Park.',
+    rating: 4.8,
+    reviews: 6,
+    badge: '33% OFF',
+    saveAmount: 17.09,
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'London Hotels',
+    scents: 'Royal Hall, Hyde Park',
+    destinationTag: 'London'
   },
   {
     id: 'california-discovery',
     name: 'California Hotel Discovery Set',
-    inspiredBy: 'Inspired by Nobu Hotel, Pelican Hill Resort, Montage Laguna Beach',
-    scents: 'Malibu, Newport Beach, The Laguna Hotel',
     price: 34.16,
     originalPrice: 51.25,
-    discount: '33% OFF',
+    category: 'Discovery Sets',
     image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&q=80&w=600&h=600',
-    bottleImage: 'https://images.unsplash.com/photo-1585232351009-3114ff160ac1?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    type: 'set'
-  }
-];
-
-const MEDITERRANEAN_COLLECTION = [
-  {
-    id: 'hotel-scent-voyage',
-    name: 'Hotel Scent Voyage Discovery Sets',
-    inspiredBy: 'Inspired by 5-Star Hotels Around the World',
-    price: 34.16,
-    originalPrice: 85.42,
-    discount: '60% OFF',
-    image: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?auto=format&fit=crop&q=80&w=600&h=600',
-    bottleImage: 'https://images.unsplash.com/photo-1594035910387-fea477942698?auto=format&fit=crop&q=80&w=400',
-    badge: 'Best-Seller',
-    type: 'set'
+    description: 'Inspired by Nobu Hotel, Pelican Hill Resort. Scents: Malibu, Newport Beach.',
+    rating: 5,
+    reviews: 9,
+    badge: '33% OFF',
+    saveAmount: 17.09,
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'California Hotels',
+    scents: 'Malibu, Newport Beach',
+    destinationTag: 'California'
   },
+  // Individual Bottles (Mediterranean Collection)
   {
     id: 'amalfi-breeze',
     name: 'Amalfi Breeze',
-    inspiredBy: 'Inspired by Santa Caterina',
-    scents: 'Sicilian Lemon, Pear, Vanilla',
     price: 17.08,
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1595123550441-d377e017de6a?auto=format&fit=crop&q=80&w=600&h=600', // Lemon bg
-    bottleImage: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=400',
+    category: 'Fragrance Oils',
+    image: 'https://images.unsplash.com/photo-1595123550441-d377e017de6a?auto=format&fit=crop&q=80&w=600&h=600',
+    description: 'Inspired by Santa Caterina. Sicilian Lemon, Pear, Vanilla.',
+    rating: 5,
+    reviews: 4,
     badge: 'New',
-    intensity: 'Medium',
-    type: 'bottle'
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Santa Caterina',
+    scents: 'Sicilian Lemon, Pear, Vanilla',
+    destinationTag: 'Mediterranean'
   },
   {
     id: 'mallorca',
     name: 'Mallorca',
-    inspiredBy: 'Inspired by Belmond La Residencia (Deià)',
-    scents: 'Grapefruit, Rose, Patchouli',
     price: 17.08,
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?auto=format&fit=crop&q=80&w=600&h=600', // Grapefruit bg
-    bottleImage: 'https://images.unsplash.com/photo-1523293188086-b589b9e5aadf?auto=format&fit=crop&q=80&w=400',
+    category: 'Fragrance Oils',
+    image: 'https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?auto=format&fit=crop&q=80&w=600&h=600',
+    description: 'Inspired by Belmond La Residencia. Grapefruit, Rose, Patchouli.',
+    rating: 5,
+    reviews: 3,
     badge: 'New',
-    intensity: 'Medium',
-    type: 'bottle',
-    variants: ['20 ml', '50 ml', '120 ml', '500 ml']
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Belmond La Residencia',
+    scents: 'Grapefruit, Rose, Patchouli',
+    variants: ['20 ml', '50 ml', '120 ml'],
+    destinationTag: 'Mediterranean'
   },
   {
     id: 'monte-carlo',
     name: 'Monte Carlo',
-    inspiredBy: 'Inspired by Hotel de Paris Monte-Carlo®',
-    scents: 'Marine, Sage, Vetiver',
     price: 17.08,
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=600&h=600', // Wine/Sage bg
-    bottleImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    intensity: 'Medium',
+    category: 'Fragrance Oils',
+    image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=600&h=600',
+    description: 'Inspired by Hotel de Paris Monte-Carlo®. Marine, Sage, Vetiver.',
     rating: 5,
     reviews: 2,
-    type: 'bottle'
+    badge: 'New',
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Hotel de Paris',
+    scents: 'Marine, Sage, Vetiver',
+    destinationTag: 'Mediterranean'
   },
   {
     id: 'cote-dazur',
     name: 'Côte d\'Azur',
-    inspiredBy: 'Inspired by Carlton Cannes, a Regent Hotel®',
-    scents: 'Orange, Violet, Mint Leaf',
     price: 17.08,
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1611145367651-6303b46e4040?auto=format&fit=crop&q=80&w=600&h=600', // Orange bg
-    bottleImage: 'https://images.unsplash.com/photo-1585232351009-3114ff160ac1?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    intensity: 'Medium',
+    category: 'Fragrance Oils',
+    image: 'https://images.unsplash.com/photo-1611145367651-6303b46e4040?auto=format&fit=crop&q=80&w=600&h=600',
+    description: 'Inspired by Carlton Cannes. Orange, Violet, Mint Leaf.',
     rating: 5,
     reviews: 1,
-    type: 'bottle'
+    badge: 'New',
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Carlton Cannes',
+    scents: 'Orange, Violet, Mint Leaf',
+    destinationTag: 'Mediterranean'
   },
   {
     id: 'palma-capri',
     name: 'Palma Capri',
-    inspiredBy: 'Inspired by Hotel La Palma® Capri',
-    scents: 'Frangipani, Sandalwood, Tonka',
     price: 17.08,
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1606041011872-596597980b57?auto=format&fit=crop&q=80&w=600&h=600', // Floral bg
-    bottleImage: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?auto=format&fit=crop&q=80&w=400',
-    badge: 'New',
-    intensity: 'Medium',
+    category: 'Fragrance Oils',
+    image: 'https://images.unsplash.com/photo-1606041011872-596597980b57?auto=format&fit=crop&q=80&w=600&h=600',
+    description: 'Inspired by Hotel La Palma® Capri. Frangipani, Sandalwood, Tonka.',
     rating: 5,
     reviews: 2,
-    type: 'bottle'
+    badge: 'New',
+    customButtonText: 'Add to Cart',
+    inspiredBy: 'Hotel La Palma',
+    scents: 'Frangipani, Sandalwood, Tonka',
+    destinationTag: 'Mediterranean'
   }
 ];
 
-export function ScentVoyage() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const medScrollRef = useRef<HTMLDivElement>(null);
+const DESTINATIONS = [
+  { id: 'all', label: 'All Destinations', image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'Paris', label: 'Paris', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'London', label: 'London', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'Mediterranean', label: 'Mediterranean', image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'Miami', label: 'Miami', image: 'https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'California', label: 'California', image: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'Coastal', label: 'Coastal', image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&q=80&w=200&h=200' },
+];
 
-  const scroll = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
-    if (ref.current) {
-      const scrollAmount = 350; // approximate card width
-      ref.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
+export function ScentVoyage() {
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
+  const [sortBy, setSortBy] = useState('featured');
+  const [selectedCategory, setSelectedCategory] = useState('All Products');
+  const [selectedDestination, setSelectedDestination] = useState('all');
+
+  // Categories
+  const categories = useMemo(() => {
+    return Array.from(new Set(VOYAGE_PRODUCTS.map(p => p.category)));
+  }, []);
+
+  // Filter Logic
+  const filteredProducts = useMemo(() => {
+    let result = [...VOYAGE_PRODUCTS];
+
+    if (selectedCategory !== 'All Products') {
+      result = result.filter(p => p.category === selectedCategory);
     }
-  };
+    
+    if (selectedDestination !== 'all') {
+      result = result.filter(p => p.destinationTag === selectedDestination);
+    }
+
+    result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'newest':
+        result.reverse(); 
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [selectedCategory, selectedDestination, priceRange, sortBy]);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[70vh]">
-        {/* Left: Image */}
-        <div className="relative h-[400px] lg:h-full w-full bg-gray-200 overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=1200"
-            alt="London Street Scene"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          {/* Overlay gradient for better text contrast if needed, but per design it's clean image */}
+    <div className="bg-white min-h-screen">
+      <Seo
+        title="Scent Voyage — Scentiment"
+        description="Travel the world through scent. Explore destination-inspired discovery sets and premium fragrance oils."
+        canonicalPath="/collection/voyage"
+      />
+      {/* Premium Hero Section */}
+      <div className="relative h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden">
+        {/* Background Image with Parallax-like effect (static for now but high quality) */}
+        <div className="absolute inset-0 z-0">
+           <img 
+             src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2000&auto=format&fit=crop" 
+             alt="Luxury Hotel Hallway" 
+             className="w-full h-full object-cover brightness-[0.6]"
+           />
         </div>
-        {/* Right: Content */}
-        <div className="flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 bg-[#fafafa]">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 text-gray-900 leading-tight">
-              Travel the World Through Scent
-            </h1>
-            <p className="text-gray-600 text-lg leading-relaxed mb-8 max-w-lg">
-              Our newest collection is inspired by iconic luxury hotels across Europe, United Kingdom, and coastal destinations. Bring five-star ambiance, elevated comfort, and unforgettable atmosphere into your home.
-            </p>
-            <Button className="bg-transparent text-black border-none p-0 hover:bg-transparent hover:text-gray-600 font-bold text-base flex items-center gap-2 group uppercase tracking-wide">
-              Shop Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </motion.div>
+        
+        <div className="container-custom relative z-10 text-center px-4">
+           <motion.div
+             initial={{ opacity: 0, y: 30 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8, ease: "easeOut" }}
+           >
+              <div className="flex items-center justify-center gap-3 mb-4">
+                 <div className="h-[1px] w-12 bg-white/60"></div>
+                 <span className="text-white/90 font-medium tracking-[0.2em] uppercase text-xs md:text-sm">
+                   The World Collection
+                 </span>
+                 <div className="h-[1px] w-12 bg-white/60"></div>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-serif font-light mb-6 text-white tracking-wide">
+                Scent Voyage
+              </h1>
+              <p className="max-w-xl mx-auto text-white/80 text-lg font-light leading-relaxed tracking-wide">
+                Embark on a sensory journey to the world's most iconic destinations. 
+                Capturing the essence of luxury travel in every drop.
+              </p>
+           </motion.div>
         </div>
+      </div>
+
+      {/* Visual Destination Filter */}
+      <section className="py-12 border-b border-gray-100 bg-gray-50/50">
+         <div className="container-custom">
+            <div className="text-center mb-8">
+               <h3 className="font-serif text-2xl text-gray-900 mb-2">Explore by Destination</h3>
+               <p className="text-gray-500 text-sm">Select a region to discover its signature scents</p>
+            </div>
+            
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide justify-start lg:justify-center px-4">
+               {DESTINATIONS.map((dest) => (
+                 <button 
+                   key={dest.id}
+                   onClick={() => setSelectedDestination(dest.id)}
+                   className={`flex flex-col items-center gap-3 min-w-[100px] group transition-all duration-300 ${selectedDestination === dest.id ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-100'}`}
+                 >
+                    <div className={`w-20 h-20 rounded-full overflow-hidden border-2 transition-all duration-300 ${selectedDestination === dest.id ? 'border-black shadow-lg' : 'border-transparent'}`}>
+                       <img src={dest.image} alt={dest.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    </div>
+                    <span className={`text-xs uppercase tracking-widest font-medium ${selectedDestination === dest.id ? 'text-black' : 'text-gray-500'}`}>
+                      {dest.label}
+                    </span>
+                 </button>
+               ))}
+            </div>
+         </div>
       </section>
 
-      {/* Discovery Sets Carousel */}
-      <section className="py-20 bg-white relative">
-        <div className="container-custom">
-          {/* Carousel Controls */}
-          <button 
-            onClick={() => scroll(scrollContainerRef, 'left')} 
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/80 hover:bg-white shadow-md rounded-full flex items-center justify-center transition-all lg:hidden"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button 
-            onClick={() => scroll(scrollContainerRef, 'right')} 
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/80 hover:bg-white shadow-md rounded-full flex items-center justify-center transition-all lg:hidden"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
+      <div className="container-custom py-16 lg:py-24">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Filters Sidebar */}
+          <FilterSidebar 
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            priceRange={priceRange}
+            onPriceChange={setPriceRange}
+            isOpenMobile={isMobileFilterOpen}
+            onCloseMobile={() => setIsMobileFilterOpen(false)}
+            className="lg:sticky lg:top-24 h-fit hidden lg:block" 
+          />
+          {/* Note: I kept sidebar hidden on mobile by default but accessible via button, and visible on desktop. 
+              Maybe for "Premium" feel we can hide it on desktop too? 
+              Let's keep it for functionality but styled minimally.
+          */}
 
-          <div 
-            ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto pb-12 snap-x snap-mandatory scrollbar-hide"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {VOYAGE_COLLECTION.map((item) => (
-              <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-start group cursor-pointer">
-                {/* Image Area */}
-                <div className="relative aspect-square rounded-xl overflow-hidden mb-4 bg-gray-100">
-                  {/* Background Scenery */}
-                  <img 
-                    src={item.image} 
-                    alt={item.name}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  {/* Overlay Bottles - Photo Card Style */}
-                  <div className="absolute inset-0 flex items-center justify-center translate-y-4 group-hover:translate-y-2 transition-transform duration-500">
-                    <div className="w-[60%] aspect-[3/4] relative shadow-xl rounded-sm overflow-hidden border border-white/80 bg-white">
-                      <img 
-                        src={item.bottleImage} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Badges */}
-                  <div className="absolute top-4 left-4 bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-                    {item.badge}
-                  </div>
-                  <button className="absolute top-4 right-4 text-gray-900 hover:text-red-500 transition-colors">
-                    <Heart className="w-5 h-5" />
-                  </button>
-
-                  {/* Add To Cart Overlay */}
-                  <div className="absolute inset-x-4 bottom-4 translate-y-[120%] group-hover:translate-y-0 transition-transform duration-300">
-                    <Button className="w-full bg-[#1a1a1a] text-white hover:bg-black uppercase tracking-widest text-xs py-3">
-                      Add To Cart
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Content Area */}
-                <div className="space-y-2">
-                  <h3 className="font-medium text-base text-gray-900">{item.name}</h3>
-                  <p className="text-[11px] text-gray-500 leading-tight">{item.inspiredBy}</p>
-                  <p className="text-[11px] text-gray-400 italic">{item.scents}</p>
-                  
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="font-bold text-sm text-gray-900">€{String(item.price).replace('.', ',')} EUR</span>
-                    <span className="text-xs text-gray-400 line-through">€{String(item.originalPrice).replace('.', ',')}</span>
-                    <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">{item.discount}</span>
-                  </div>
-
-                  {item.hasTopToggle && (
-                    <div className="flex gap-2 mt-3">
-                      <button className="flex-1 py-1 text-[10px] border border-gray-300 rounded hover:border-black transition-colors">Top 3</button>
-                      <button className="flex-1 py-1 text-[10px] border border-gray-300 rounded hover:border-black transition-colors">Top 5</button>
-                    </div>
-                  )}
+          <main className="flex-1">
+             {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 sticky top-20 z-30 bg-white/95 backdrop-blur-md py-4 sm:py-2 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-gray-100 sm:border-none transition-all duration-300">
+              <div className="text-sm text-gray-500">
+                {selectedDestination !== 'all' && <span className="text-black font-medium mr-1">{DESTINATIONS.find(d => d.id === selectedDestination)?.label}:</span>}
+                Showing <span className="font-bold text-black">{filteredProducts.length}</span> scents
+              </div>
+              
+              <div className="flex items-center gap-4 w-full sm:w-auto">
+                <Button 
+                  variant="outline" 
+                  className="lg:hidden flex-1 flex items-center gap-2"
+                  onClick={() => setIsMobileFilterOpen(true)}
+                >
+                  <SlidersHorizontal className="w-4 h-4" /> Filters
+                </Button>
+                
+                <div className="flex-1 sm:flex-none flex justify-end">
+                   <SortDropdown sortBy={sortBy} onSortChange={setSortBy} />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div className="mt-12 text-center">
-            <Button className="bg-[#1a1a1a] text-white px-8 py-3 rounded-full hover:bg-black transition-colors uppercase tracking-widest text-xs font-bold">
-              View Full Collection
-            </Button>
-          </div>
+            {/* Product Grid */}
+            {filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                {filteredProducts.map((product, i) => (
+                  <motion.div
+                    key={`${product.id}-${i}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-32 bg-gray-50 rounded-sm border border-dashed border-gray-200">
+                <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 mb-6 font-light text-lg">No scents found in this region.</p>
+                <Button 
+                  onClick={() => {
+                    setSelectedCategory('All Products');
+                    setPriceRange([0, 200]);
+                    setSelectedDestination('all');
+                  }}
+                  variant="outline"
+                  className="uppercase tracking-widest text-xs"
+                >
+                  View All Destinations
+                </Button>
+              </div>
+            )}
+          </main>
         </div>
-      </section>
+      </div>
 
-      {/* Mediterranean Escape Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[70vh]">
-        {/* Left: Content */}
-        <div className="flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 bg-[#fafafa]">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 text-gray-900 leading-tight">
-              Mediterranean Escape
+      {/* Featured Destination (Editorial Style) */}
+      <section className="py-24 bg-[#1a1a1a] text-white overflow-hidden relative">
+        <div className="absolute inset-0 opacity-30">
+           <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=2000&auto=format&fit=crop" alt="Santorini" className="w-full h-full object-cover" />
+        </div>
+        <div className="container-custom relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="max-w-xl">
+            <span className="text-[#d4af37] font-medium tracking-[0.2em] uppercase text-xs mb-6 block">
+              Editor's Pick
+            </span>
+            <h2 className="text-4xl md:text-6xl font-serif font-medium mb-8 leading-tight">
+              Summer in <br/><i className="font-light">Santorini</i>
             </h2>
-            <p className="text-gray-600 text-lg leading-relaxed mb-8 max-w-lg">
-              Sun-soaked elegance inspired by coastal hotels in Italy, Monaco, Mallorca, and Cannes. These scents capture warm breezes, relaxed luxury, and the effortless charm of seaside living.
+            <p className="text-gray-300 text-lg leading-relaxed mb-10 font-light">
+               Experience the crisp Aegean breeze, white-washed architecture, and volcanic earth. 
+               Our upcoming Santorini collection brings the essence of the Greek islands to your living room.
             </p>
-            <Button className="bg-transparent text-black border-none p-0 hover:bg-transparent hover:text-gray-600 font-bold text-base flex items-center gap-2 group uppercase tracking-wide">
-              Shop Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <Button variant="secondary" className="bg-white text-black hover:bg-gray-200 border-none px-8 py-4 h-auto text-xs tracking-widest uppercase">
+              Join the Waitlist
             </Button>
-          </motion.div>
-        </div>
-
-        {/* Right: Image */}
-        <div className="relative h-[400px] lg:h-full w-full bg-gray-200 overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&q=80&w=1200"
-            alt="Mediterranean Amalfi Coast"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          {/* Overlay bottle image - Photo Card Style */}
-          <div className="absolute inset-0 flex items-center justify-center translate-y-12">
-             <div className="w-[280px] aspect-[3/4] relative shadow-2xl rounded-sm overflow-hidden border-4 border-white transform rotate-3 hover:rotate-0 transition-transform duration-500">
-               <img 
-                 src="https://images.unsplash.com/photo-1594035910387-fea477942698?auto=format&fit=crop&q=80&w=600" 
-                 alt="Amalfi Breeze" 
-                 className="w-full h-full object-cover"
-               />
-             </div>
           </div>
+          
+          {/* Abstract Visual Element */}
+          <div className="hidden md:block w-px h-64 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
+          
+           <div className="text-right hidden md:block">
+              <p className="text-sm text-gray-400 uppercase tracking-widest mb-2">Launch Date</p>
+              <p className="text-2xl font-serif">June 2024</p>
+           </div>
         </div>
       </section>
 
-      {/* Mediterranean Collection Carousel */}
-      <section className="py-20 bg-white relative">
-        <div className="container-custom">
-          {/* Carousel Controls */}
-          <button 
-            onClick={() => scroll(medScrollRef, 'left')} 
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/80 hover:bg-white shadow-md rounded-full flex items-center justify-center transition-all lg:hidden"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button 
-            onClick={() => scroll(medScrollRef, 'right')} 
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/80 hover:bg-white shadow-md rounded-full flex items-center justify-center transition-all lg:hidden"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
+      {/* Why Choose Us */}
+      <FeaturesSection />
 
-          <div 
-            ref={medScrollRef}
-            className="flex gap-6 overflow-x-auto pb-12 snap-x snap-mandatory scrollbar-hide"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {MEDITERRANEAN_COLLECTION.map((item) => (
-              <div key={item.id} className="min-w-[280px] md:min-w-[320px] snap-start group cursor-pointer">
-                {/* Image Area */}
-                <div className="relative aspect-square rounded-xl overflow-hidden mb-4 bg-gray-100">
-                  {/* Background Scenery/Ingredient */}
-                  <img 
-                    src={item.image} 
-                    alt={item.name}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  {/* Overlay Bottle - Photo Card Style */}
-                  <div className="absolute inset-0 flex items-center justify-center translate-y-4 group-hover:translate-y-2 transition-transform duration-500">
-                    <div className="w-[60%] aspect-[3/4] relative shadow-xl rounded-sm overflow-hidden border border-white/80 bg-white">
-                      <img 
-                        src={item.bottleImage} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Badges */}
-                  <div className="absolute top-4 left-4 bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-                    {item.badge}
-                  </div>
-                  <button className="absolute top-4 right-4 text-gray-900 hover:text-red-500 transition-colors">
-                    <Heart className="w-5 h-5" />
-                  </button>
+      {/* FAQ */}
+      <FAQSection />
 
-                  {/* Add To Cart Overlay */}
-                  <div className="absolute inset-x-4 bottom-4 translate-y-[120%] group-hover:translate-y-0 transition-transform duration-300">
-                    <Button className="w-full bg-[#1a1a1a] text-white hover:bg-black uppercase tracking-widest text-xs py-3">
-                      View Full Collection
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Content Area */}
-                <div className="space-y-2">
-                  <h3 className="font-medium text-base text-gray-900">{item.name}</h3>
-                  <p className="text-[11px] text-gray-500 leading-tight">{item.inspiredBy}</p>
-                  <p className="text-[11px] text-gray-400 italic">{item.scents}</p>
-                  
-                  {item.intensity && (
-                    <div className="flex items-center gap-1 text-[11px] text-gray-600">
-                       <BarChart2 className="w-3 h-3" />
-                       <span className="font-medium">{item.intensity}</span>
-                       <Info className="w-3 h-3 text-gray-400 ml-1" />
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs text-gray-500">From</span>
-                    <span className="font-bold text-sm text-gray-900">€{String(item.price).replace('.', ',')} EUR</span>
-                    {item.originalPrice && (
-                       <>
-                         <span className="text-xs text-gray-400 line-through">€{String(item.originalPrice).replace('.', ',')}</span>
-                         <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">{item.discount}</span>
-                       </>
-                    )}
-                  </div>
-
-                  {item.variants && (
-                    <div className="flex gap-2 mt-3">
-                      {item.variants.slice(0, 3).map(v => (
-                         <button key={v} className="flex-1 py-1 text-[10px] border border-gray-300 rounded hover:border-black transition-colors">{v}</button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <Button className="bg-[#1a1a1a] text-white px-8 py-3 rounded-full hover:bg-black transition-colors uppercase tracking-widest text-xs font-bold">
-              View Full Collection
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* Newsletter */}
+      <NewsletterSection />
     </div>
   );
 }

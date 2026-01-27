@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import sampleImage from '@/assets/images/sample.png';
+import { Tilt } from '@/components/ui/motion/Tilt';
 
 const HERO_COPY = {
   eyebrow: 'Scentiment',
@@ -19,6 +20,23 @@ export function Hero() {
   const reduceMotion = useReducedMotion();
   const opacity = useTransform(scrollY, [0, 600], [1, 0.9]);
   const y = useTransform(scrollY, [0, 600], [0, 24]);
+
+  const visualRef = useRef<HTMLDivElement | null>(null);
+  const visualInView = useInView(visualRef, { margin: '-20%', once: false });
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    if (reduceMotion || !visualInView) {
+      el.pause()
+      return
+    }
+    const p = el.play()
+    if (p && typeof (p as Promise<void>).catch === 'function') {
+      ;(p as Promise<void>).catch(() => {})
+    }
+  }, [reduceMotion, visualInView])
 
   const floating = useMemo(() => {
     if (reduceMotion) return undefined;
@@ -87,16 +105,42 @@ export function Hero() {
               style={{ willChange: reduceMotion ? undefined : 'transform' }}
             >
               <div className="absolute -inset-4 rounded-2xl bg-gradient-to-b from-white/80 to-white/20 blur-xl" />
-              <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/60 shadow-lg backdrop-blur">
-                <div className="aspect-[4/5] w-full">
-                  <img src={sampleImage} alt="Premium fragrance" className="h-full w-full object-cover" loading="eager" decoding="async" />
+              <Tilt className="relative">
+                <div ref={visualRef} className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/60 shadow-lg backdrop-blur">
+                  <div className="aspect-[4/5] w-full relative">
+                    <video
+                      ref={videoRef}
+                      className={cn(
+                        'absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500',
+                        !reduceMotion && visualInView ? 'opacity-100' : 'opacity-0'
+                      )}
+                      playsInline
+                      muted
+                      loop
+                      preload="none"
+                      poster={sampleImage}
+                    >
+                      <source src="https://cdn.coverr.co/videos/coverr-lighting-a-candle-6698/1080p.mp4" type="video/mp4" />
+                    </video>
+                    <img
+                      src={sampleImage}
+                      alt="Premium fragrance"
+                      className={cn(
+                        'relative h-full w-full object-cover transition-opacity duration-500',
+                        !reduceMotion && visualInView ? 'opacity-0' : 'opacity-100'
+                      )}
+                      loading="eager"
+                      decoding="async"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 border-t border-gray-200 bg-white/70 p-3 text-[11px] font-medium text-gray-700">
+                    <div className="rounded-sm bg-gray-50 px-2 py-1 text-center">Diffusers</div>
+                    <div className="rounded-sm bg-gray-50 px-2 py-1 text-center">Oils</div>
+                    <div className="rounded-sm bg-gray-50 px-2 py-1 text-center">Perfumes</div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 border-t border-gray-200 bg-white/70 p-3 text-[11px] font-medium text-gray-700">
-                  <div className="rounded-sm bg-gray-50 px-2 py-1 text-center">Diffusers</div>
-                  <div className="rounded-sm bg-gray-50 px-2 py-1 text-center">Oils</div>
-                  <div className="rounded-sm bg-gray-50 px-2 py-1 text-center">Perfumes</div>
-                </div>
-              </div>
+              </Tilt>
             </motion.div>
           </div>
         </div>

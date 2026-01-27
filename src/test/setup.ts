@@ -32,3 +32,13 @@ if (!('ResizeObserver' in globalThis)) {
     MockResizeObserver as unknown as typeof ResizeObserver;
 }
 
+if (typeof HTMLMediaElement !== 'undefined') {
+  Object.defineProperty(HTMLMediaElement.prototype, 'play', {
+    configurable: true,
+    value: () => Promise.resolve()
+  })
+  Object.defineProperty(HTMLMediaElement.prototype, 'pause', {
+    configurable: true,
+    value: () => {}
+  })
+}

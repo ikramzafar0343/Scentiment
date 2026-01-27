@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
+import { Seo } from '@/components/seo/Seo';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -38,6 +39,11 @@ export function Contact() {
 
   return (
     <div className="container-custom py-16 max-w-2xl mx-auto">
+      <Seo
+        title="Contact — Scentiment"
+        description="Need help choosing a scent or checking an order? Contact Scentiment and our team will respond quickly."
+        canonicalPath="/contact"
+      />
       <h1 className="text-4xl font-bold text-center mb-8 uppercase tracking-widest">Contact Us</h1>
       
       {isSubmitted ? (

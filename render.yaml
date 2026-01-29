@@ -1,10 +1,7 @@
 services:
-  # Backend API Service (NestJS)
   - type: web
     name: scentiment-backend
     env: node
-    # Note: Free tier - service spins down after 15 min of inactivity
-    # Remove this comment and add 'plan: starter' if you upgrade to paid plan
     buildCommand: cd backend && npm install && npm run build
     startCommand: cd backend && npm run start:prod
     envVars:
@@ -15,35 +12,30 @@ services:
       - key: HOST
         value: 0.0.0.0
       - key: MONGODB_URI
-        sync: false  # REQUIRED: Set this in Render dashboard (MongoDB Atlas connection string)
+        sync: false
       - key: JWT_SECRET
-        sync: false  # REQUIRED: Set this in Render dashboard (generate with: openssl rand -base64 32)
+        sync: false
       - key: JWT_EXPIRATION
         value: 1h
       - key: JWT_REFRESH_SECRET
-        sync: false  # REQUIRED: Set this in Render dashboard (generate with: openssl rand -base64 32)
+        sync: false
       - key: JWT_REFRESH_EXPIRATION
         value: 7d
       - key: FRONTEND_URL
-        sync: false  # Set this manually in Render dashboard after frontend is deployed
-        # Example: https://scentiment-frontend.onrender.com
+        sync: false
       - key: REDIS_URL
-        sync: false  # Optional - set if using Redis
+        sync: false
       - key: STRIPE_SECRET_KEY
-        sync: false  # Optional - set if using Stripe payments
+        sync: false
 
-  # Frontend Static Site (React + Vite)
   - type: web
     name: scentiment-frontend
     env: static
-    # Static sites are always free on Render
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_BASE_URL
-        sync: false  # REQUIRED: Set this manually in Render dashboard after backend is deployed
-        # Set to: https://scentiment-backend.onrender.com/api/v1
-        # (Replace 'scentiment-backend' with your actual backend service name)
+        sync: false
     routes:
       - type: rewrite
         source: /*

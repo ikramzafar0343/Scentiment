@@ -25,9 +25,9 @@ export default defineConfig({
 
   // ✅ Allow Render domains in preview mode
   preview: {
-    allowedHosts: [
-      '.onrender.com'
-    ]
+     allowedHosts: [
+      'scentiment-9zi3.onrender.com', // Add your Render URL here
+    ],
   },
 
   build: {

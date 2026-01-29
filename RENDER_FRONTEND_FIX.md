@@ -6,64 +6,69 @@ Render is trying to run your frontend as a web service (`npm run dev`) instead o
 - Port detection issues
 - Wrong service type
 
-## Solution
+## Root Cause
+The service was likely created as a **web service** before the `render.yaml` was fixed. Render doesn't automatically change service types - you must delete and recreate.
 
-### Option 1: Delete and Recreate (Recommended)
+## Solution: Delete and Recreate Service
 
-1. **Delete the existing frontend service:**
-   - Go to Render Dashboard
-   - Find `scentiment-frontend` service
-   - Click "Settings" → Scroll down → "Delete Service"
+### Step 1: Delete Existing Service
 
-2. **Redeploy from Blueprint:**
-   - Go to your Blueprint
-   - Click "Manual Deploy" or wait for auto-deploy
-   - Render will create it as a static site this time
+1. Go to Render Dashboard: https://dashboard.render.com/
+2. Find `scentiment-frontend` service
+3. Click on it
+4. Go to **Settings** (top right)
+5. Scroll to **"Danger Zone"** at the bottom
+6. Click **"Delete Service"**
+7. Confirm deletion
 
-### Option 2: Manually Change Service Type
+### Step 2: Recreate as Static Site
 
-1. **Go to Frontend Service Settings:**
-   - Render Dashboard → `scentiment-frontend` → Settings
+**Option A: Let Blueprint Recreate It (Recommended)**
 
-2. **Change Service Type:**
-   - Scroll to "Service Details"
-   - You can't directly change type, but you can:
-     - Delete the service
-     - Create new "Static Site" manually
-     - Or redeploy from blueprint
+1. After deleting, go to your **Blueprint**
+2. Click **"Manual Deploy"** or wait for auto-deploy
+3. Render will recreate it as a static site from `render.yaml`
 
-### Option 3: Create Static Site Manually
+**Option B: Create Manually**
 
-1. **Delete the web service version:**
-   - Delete `scentiment-frontend` web service
-
-2. **Create New Static Site:**
-   - Render Dashboard → "New +" → "Static Site"
-   - Connect your repository
-   - Configure:
-     - **Name:** `scentiment-frontend`
-     - **Build Command:** `npm install && npm run build`
-     - **Publish Directory:** `dist`
-   
-3. **Set Environment Variable:**
-   - `VITE_API_BASE_URL` = `https://scentiment-backend.onrender.com/api/v1`
+1. Render Dashboard → **"New +"** → **"Static Site"**
+2. Connect your Git repository
+3. Configure:
+   - **Name:** `scentiment-frontend`
+   - **Branch:** `main`
+   - **Root Directory:** (leave empty - root of repo)
+   - **Build Command:** `npm install && npm run build`
+   - **Publish Directory:** `dist`
+4. Click **"Create Static Site"**
+5. Set Environment Variable:
+   - Go to **Environment** tab
+   - Add: `VITE_API_BASE_URL` = `https://scentiment-backend.onrender.com/api/v1`
      (Replace with your actual backend URL)
-
-4. **Enable SPA Routing:**
-   - In "Advanced" → "Redirects/Rewrites"
-   - Add rewrite rule:
-     - Source: `/*`
-     - Destination: `/index.html`
+6. Enable SPA Routing:
+   - Go to **Settings** → **Redirects/Rewrites**
+   - Add rewrite:
+     - **Source:** `/*`
+     - **Destination:** `/index.html`
 
 ## Verify It's Working
 
-After fixing, the static site should:
-- ✅ Build successfully
-- ✅ Serve files from `dist` directory
-- ✅ Not run `npm run dev`
-- ✅ Not require ports
-- ✅ Not use memory for a dev server
+After recreating, check the logs. You should see:
+- ✅ Build command runs: `npm install && npm run build`
+- ✅ Files uploaded from `dist` directory
+- ✅ **NO** `npm run dev` command
+- ✅ **NO** port detection
+- ✅ **NO** memory errors
 
-## Current render.yaml (Correct)
+## Important Notes
 
-The `render.yaml` is already correct with `type: static`. The issue is that Render created the service as a web service before the fix. You need to delete and recreate it.
+- **Static sites don't run servers** - they just serve files
+- **No start command needed** - Render serves the built files automatically
+- **No ports needed** - static sites use Render's CDN
+- **Free tier** - static sites are always free on Render
+
+## If It Still Doesn't Work
+
+1. Check service type in Render dashboard - should say "Static Site"
+2. Verify `render.yaml` has `type: static` (not `type: web`)
+3. Make sure `publishPath` is `./dist` (not `staticPublishPath`)
+4. Contact Render support if issues persist

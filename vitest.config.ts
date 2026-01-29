@@ -7,6 +7,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
+
+  // ✅ Allow Render domain in production preview
+  preview: {
+    allowedHosts: ['.onrender.com']
+  },
+
   test: {
     environment: 'jsdom',
     globals: true,

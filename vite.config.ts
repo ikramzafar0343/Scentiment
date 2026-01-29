@@ -16,11 +16,20 @@ export default defineConfig({
       filename: 'stats.html'
     })
   ],
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
+
+  // ✅ Allow Render domains in preview mode
+  preview: {
+    allowedHosts: [
+      '.onrender.com'
+    ]
+  },
+
   build: {
     rollupOptions: {
       output: {

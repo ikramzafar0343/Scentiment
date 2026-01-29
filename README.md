@@ -185,9 +185,16 @@ This project is configured for deployment on [Render](https://render.com/) with 
    - `JWT_REFRESH_EXPIRATION` - Refresh token expiration (default: `7d`)
 
    **For Frontend Service:**
-   - `VITE_API_BASE_URL` - Set this to your backend URL + `/api/v1`
+   - `VITE_API_BASE_URL` - **REQUIRED** - Set this to your backend URL + `/api/v1`
      - Example: `https://scentiment-backend.onrender.com/api/v1`
-     - **Important:** The `render.yaml` will try to auto-set this, but you may need to manually update it in the Render dashboard after the first deployment to include `/api/v1`
+     - **Important:** You must set this manually in the Render dashboard after the backend is deployed
+     - Get your backend URL from the backend service's "Settings" → "Info" section
+   
+   **For Backend Service:**
+   - `FRONTEND_URL` - **REQUIRED** - Set this to your frontend URL
+     - Example: `https://scentiment-frontend.onrender.com`
+     - Used for CORS configuration
+     - Set this after the frontend is deployed
 
 4. **Deploy**
    - Render will automatically build and deploy both services

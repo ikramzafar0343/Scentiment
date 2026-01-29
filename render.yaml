@@ -24,10 +24,8 @@ services:
       - key: JWT_REFRESH_EXPIRATION
         value: 7d
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: scentiment-frontend
-          property: url
+        sync: false  # Set this manually in Render dashboard after frontend is deployed
+        # Example: https://scentiment-frontend.onrender.com
       - key: REDIS_URL
         sync: false  # Optional - set if using Redis
       - key: STRIPE_SECRET_KEY
@@ -41,14 +39,9 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: scentiment-backend
-          property: url
-        # The frontend expects the full API URL including /api/v1
-        # Render will set this to: https://scentiment-backend.onrender.com
-        # You may need to manually append /api/v1 in Render dashboard:
-        # Set VITE_API_BASE_URL to: https://scentiment-backend.onrender.com/api/v1
+        sync: false  # REQUIRED: Set this manually in Render dashboard after backend is deployed
+        # Set to: https://scentiment-backend.onrender.com/api/v1
+        # (Replace 'scentiment-backend' with your actual backend service name)
     routes:
       - type: rewrite
         source: /*

@@ -28,14 +28,20 @@ services:
       - key: STRIPE_SECRET_KEY
         sync: false
 
-  - type: web
+  - type: static
     name: scentiment-frontend
-    env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_BASE_URL
         sync: false
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
     routes:
       - type: rewrite
         source: /*

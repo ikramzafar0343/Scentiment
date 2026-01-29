@@ -40,12 +40,23 @@ async function bootstrap() {
   // Compression
   await app.register(compression);
 
-  // CORS - Allow multiple origins for dev and production
+  const rawFrontendUrls = (process.env.FRONTEND_URL ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const normalizedFrontendUrls = rawFrontendUrls
+    .map((value) => {
+      const trimmed = value.replace(/\/+$/, '');
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+      return `https://${trimmed}`;
+    });
+
   const allowedOrigins = [
-    'http://localhost:5173', // Local development
-    'http://localhost:3000', // Local preview
-    process.env.FRONTEND_URL, // Production frontend URL
-  ].filter(Boolean); // Remove undefined values
+    'http://localhost:5173',
+    'http://localhost:3000',
+    ...normalizedFrontendUrls,
+  ];
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -58,7 +69,7 @@ async function bootstrap() {
       } else {
         // In production, be more strict; in dev, allow all
         if (process.env.NODE_ENV === 'production') {
-          callback(new Error('Not allowed by CORS'));
+          callback(new Error('Not allowed by CORS'), false);
         } else {
           callback(null, true); // Allow all in development
         }

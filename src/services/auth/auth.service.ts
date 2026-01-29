@@ -12,7 +12,20 @@ const STORAGE_KEY = 'scentiment-auth';
 
 function getApiBaseUrl(): string {
   const env = import.meta.env as Record<string, string | undefined>;
-  return env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1';
+  const raw = (env.VITE_API_BASE_URL ?? '').trim();
+  if (!raw) {
+    return import.meta.env.PROD ? '/api/v1' : 'http://localhost:3000/api/v1';
+  }
+
+  const withoutTrailingSlash = raw.replace(/\/+$/, '');
+  const withScheme =
+    withoutTrailingSlash.startsWith('http://') || withoutTrailingSlash.startsWith('https://')
+      ? withoutTrailingSlash
+      : withoutTrailingSlash.startsWith('/')
+        ? withoutTrailingSlash
+        : `https://${withoutTrailingSlash}`;
+  const base = withScheme.replace(/\/+$/, '');
+  return base.endsWith('/api/v1') ? base : `${base}/api/v1`;
 }
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {

@@ -2,7 +2,25 @@
 // This file contains the API client for payment operations
 // Backend endpoints should be implemented to handle these requests securely
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+function normalizeApiBaseUrl(raw?: string): string {
+  const value = (raw ?? '').trim();
+  if (!value) {
+    return import.meta.env.PROD ? '/api/v1' : 'http://localhost:3000/api/v1';
+  }
+
+  const withoutTrailingSlash = value.replace(/\/+$/, '');
+  const withScheme =
+    withoutTrailingSlash.startsWith('http://') || withoutTrailingSlash.startsWith('https://')
+      ? withoutTrailingSlash
+      : withoutTrailingSlash.startsWith('/')
+        ? withoutTrailingSlash
+        : `https://${withoutTrailingSlash}`;
+
+  const base = withScheme.replace(/\/+$/, '');
+  return base.endsWith('/api/v1') ? base : `${base}/api/v1`;
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 async function apiRequest<T>(
   endpoint: string,

@@ -10,14 +10,15 @@ import { CTASection } from '@/components/home/CTASection';
 import { FAQSection } from '@/components/home/FAQSection';
 import { GuaranteesBar } from '@/components/home/GuaranteesBar';
 import { StickyMobileCTA } from '@/components/ui/StickyMobileCTA';
-import { PRODUCTS } from '@/lib/data';
+import { useCatalogProducts } from '@/hooks/useCatalog';
 import { Seo } from '@/components/seo/Seo';
 
 export function Home() {
-  const featured = PRODUCTS.slice(0, 6);
+  const products = useCatalogProducts();
+  const featured = products.slice(0, 6);
 
   return (
-    <div className="relative min-h-screen bg-white text-gray-900">
+    <div className="page-surface relative min-h-screen">
       <Seo
         title="Scentiment — Premium Home Fragrance & Diffuser Oils"
         description="Transform your space with premium home fragrance. Discover luxury diffusers, hotel-inspired oils, designer scents, and curated collections. Fast shipping, clean ingredients, expert support."

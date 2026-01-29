@@ -1,9 +1,54 @@
 services:
+  # Backend API Service (NestJS)
   - type: web
-    name: scentiment
+    name: scentiment-backend
+    env: node
+    plan: starter
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: MONGODB_URI
+        sync: false  # REQUIRED: Set this in Render dashboard (MongoDB Atlas connection string)
+      - key: JWT_SECRET
+        sync: false  # REQUIRED: Set this in Render dashboard (generate with: openssl rand -base64 32)
+      - key: JWT_EXPIRATION
+        value: 1h
+      - key: JWT_REFRESH_SECRET
+        sync: false  # REQUIRED: Set this in Render dashboard (generate with: openssl rand -base64 32)
+      - key: JWT_REFRESH_EXPIRATION
+        value: 7d
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: scentiment-frontend
+          property: url
+      - key: REDIS_URL
+        sync: false  # Optional - set if using Redis
+      - key: STRIPE_SECRET_KEY
+        sync: false  # Optional - set if using Stripe payments
+
+  # Frontend Static Site (React + Vite)
+  - type: web
+    name: scentiment-frontend
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: scentiment-backend
+          property: url
+        # The frontend expects the full API URL including /api/v1
+        # Render will set this to: https://scentiment-backend.onrender.com
+        # You may need to manually append /api/v1 in Render dashboard:
+        # Set VITE_API_BASE_URL to: https://scentiment-backend.onrender.com/api/v1
     routes:
       - type: rewrite
         source: /*

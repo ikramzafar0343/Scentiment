@@ -13,16 +13,16 @@ function renderHome() {
 describe('Home page', () => {
   it('renders the hero value proposition and primary CTA', () => {
     renderHome();
-    expect(screen.getByRole('heading', { name: /premium home fragrance, made effortless\./i })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /browse collection/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /transform your space with premium home fragrance\./i })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /shop collection/i })).toBeTruthy();
   });
 
   it('renders key conversion sections', () => {
     renderHome();
-    expect(screen.getByRole('heading', { name: /from discovery to delight in 4 steps/i })).toBeTruthy();
-    expect(screen.getByRole('heading', { name: /everything you need to buy with confidence/i })).toBeTruthy();
-    expect(screen.getByRole('heading', { name: /trusted by customers who care about quality/i })).toBeTruthy();
-    expect(screen.getByRole('heading', { name: /answers to common questions/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /your journey to premium home fragrance/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /what makes scentiment different/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /what our customers say/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /everything you need to know/i })).toBeTruthy();
   });
 
   it('allows toggling FAQ items', () => {
@@ -33,13 +33,13 @@ describe('Home page', () => {
     expect(panelId).toBeTruthy();
     if (panelId) {
       const panel = document.getElementById(panelId);
-      expect(panel?.className.includes('hidden')).toBe(true);
+      expect(panel?.className.includes('max-h-0')).toBe(true);
     }
     fireEvent.click(question);
     expect(question.getAttribute('aria-expanded')).toBe('true');
     if (panelId) {
       const panel = document.getElementById(panelId);
-      expect(panel?.className.includes('hidden')).toBe(false);
+      expect(panel?.className.includes('max-h-96')).toBe(true);
     }
   });
 });

@@ -39,25 +39,27 @@ export function FilterSidebar({
       />
 
       <aside className={cn(
-        "bg-white w-[280px] flex-shrink-0 lg:block",
-        "fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:static lg:transform-none lg:z-0 shadow-xl lg:shadow-none border-r lg:border-none border-gray-100",
+        "w-[280px] flex-shrink-0 lg:block",
+        "fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:static lg:transform-none lg:z-0",
+        "bg-white/95 backdrop-blur-xl shadow-xl lg:bg-transparent lg:shadow-none",
+        "border-r border-black/10 lg:border-none",
         isOpenMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         className
       )}>
-        <div className="h-full overflow-y-auto p-6 lg:p-0 bg-white lg:max-h-[calc(100vh-150px)] lg:overflow-y-auto scrollbar-hide">
-          <div className="flex items-center justify-between mb-8 lg:hidden">
+        <div className="h-full overflow-y-auto p-6 lg:p-0 lg:max-h-[calc(100vh-150px)] lg:overflow-y-auto scrollbar-hide">
+          <div className="ui-card p-6">
+            <div className="flex items-center justify-between mb-8 lg:hidden">
              <span className="text-lg font-bold uppercase tracking-widest">Filters</span>
-             <button onClick={onCloseMobile} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+             <button onClick={onCloseMobile} className="p-2 hover:bg-gray-100 rounded-full transition-colors ui-focus-ring" aria-label="Close filters">
                <X className="w-5 h-5" />
              </button>
-          </div>
+            </div>
 
-          <div className="space-y-8">
-            {/* Categories */}
-            <div className="border-b border-gray-100 pb-8 lg:border-none lg:pb-0">
+            <div className="space-y-8">
+              <div className="border-b border-black/10 pb-8">
               <button 
                 onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                className="flex items-center justify-between w-full mb-4 group"
+                className="flex items-center justify-between w-full mb-4 group ui-focus-ring rounded-lg"
               >
                 <h3 className="font-bold uppercase text-xs tracking-widest group-hover:text-gray-600 transition-colors">Categories</h3>
                 {isCategoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -69,8 +71,8 @@ export function FilterSidebar({
                     <button 
                       onClick={() => onSelectCategory('All Products')}
                       className={cn(
-                        "hover:text-black transition-colors text-left w-full py-1",
-                        selectedCategory === 'All Products' ? "font-bold text-black" : ""
+                        'ui-menu-item ui-focus-ring text-left',
+                        selectedCategory === 'All Products' ? 'bg-black/[0.04] text-gray-900 font-semibold' : ''
                       )}
                     >
                       All Products
@@ -81,8 +83,8 @@ export function FilterSidebar({
                       <button 
                         onClick={() => onSelectCategory(cat)}
                         className={cn(
-                          "hover:text-black transition-colors text-left w-full py-1",
-                          selectedCategory === cat ? "font-bold text-black" : ""
+                          'ui-menu-item ui-focus-ring text-left',
+                          selectedCategory === cat ? 'bg-black/[0.04] text-gray-900 font-semibold' : ''
                         )}
                       >
                         {cat}
@@ -93,11 +95,10 @@ export function FilterSidebar({
               )}
             </div>
 
-            {/* Price Range */}
             <div>
               <button 
                 onClick={() => setIsPriceOpen(!isPriceOpen)}
-                className="flex items-center justify-between w-full mb-4 group"
+                className="flex items-center justify-between w-full mb-4 group ui-focus-ring rounded-lg"
               >
                 <h3 className="font-bold uppercase text-xs tracking-widest group-hover:text-gray-600 transition-colors">Price Range</h3>
                  {isPriceOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -112,8 +113,8 @@ export function FilterSidebar({
                   <input 
                     type="range" 
                     min="0" 
-                    max="200" 
-                    step="5"
+                    max="2000" 
+                    step="10"
                     value={priceRange[1]}
                     onChange={(e) => onPriceChange([priceRange[0], parseInt(e.target.value)])}
                     className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black hover:accent-gray-800"
@@ -122,7 +123,7 @@ export function FilterSidebar({
                      <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => onPriceChange([0, 200])}
+                        onClick={() => onPriceChange([0, 2000])}
                         className="text-[10px] h-7 px-3 uppercase tracking-wider"
                      >
                         Reset
@@ -131,6 +132,7 @@ export function FilterSidebar({
                 </div>
               )}
             </div>
+          </div>
           </div>
         </div>
       </aside>

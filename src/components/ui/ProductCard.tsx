@@ -1,9 +1,32 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore, Product } from '@/store/useCartStore';
 import { Button } from './Button';
-import { formatPrice } from '@/lib/utils';
+import { cn, formatPrice, slugify } from '@/lib/utils';
 import { Star, Heart, Check, ShoppingBag } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const BADGE_STYLES: Record<string, string> = {
+  'SALE': 'bg-red-600',
+  'NEW': 'bg-green-600',
+  'BESTSELLER': 'bg-blue-600',
+  'LIMITED': 'bg-purple-600',
+};
+
+function ProductBadge({ badge }: { badge: string }) {
+  const badgeClass = badge.includes('OFF') 
+    ? 'bg-black' 
+    : BADGE_STYLES[badge] || 'bg-gray-600';
+  
+  return (
+    <div className={cn(
+      'absolute top-3 left-3 rounded-full text-white text-[10px] font-extrabold px-2.5 py-1 leading-none uppercase tracking-widest shadow-sm',
+      badgeClass
+    )}>
+      {badge}
+    </div>
+  );
+}
 
 interface ProductCardProps {
   product: Product & { 
@@ -20,6 +43,94 @@ interface ProductCardProps {
         endTime: string;
     }
   };
+}
+
+interface ProductCardActionsProps {
+  product: ProductCardProps['product'];
+  productUrl: string;
+  hasVariants: boolean;
+  variants?: string[];
+  isAdded: boolean;
+  onAddToCart: () => void;
+  onNavigate: (url: string, state?: any) => void;
+}
+
+function ProductCardActions({
+  product,
+  productUrl,
+  hasVariants,
+  variants,
+  isAdded,
+  onAddToCart,
+  onNavigate,
+}: ProductCardActionsProps) {
+  if (hasVariants && variants) {
+    return (
+      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out bg-white/95 backdrop-blur-md border-t border-gray-100/50">
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-1.5 justify-center">
+            {variants.slice(0, 4).map((variant) => (
+              <button
+                key={variant}
+                type="button"
+                className="text-[10px] border border-gray-200 px-2 py-1 rounded-sm hover:border-black transition-colors bg-white text-gray-600 hover:text-black ui-focus-ring"
+              >
+                {variant}
+              </button>
+            ))}
+            {variants.length > 4 && (
+              <span className="text-[10px] px-1 py-1 text-gray-400">+{variants.length - 4}</span>
+            )}
+          </div>
+          <Button
+            onClick={() => onNavigate(productUrl, { state: { product } })}
+            variant="outline"
+            className="w-full text-xs uppercase tracking-widest h-9"
+          >
+            {product.customButtonText || 'View Options'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out bg-white/95 backdrop-blur-md border-t border-gray-100/50">
+      <Button
+        onClick={onAddToCart}
+        disabled={isAdded}
+        variant="primary"
+        className={cn(
+          'w-full h-10 text-xs shadow-none',
+          isAdded && 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-transparent'
+        )}
+      >
+        <AnimatePresence mode="wait">
+          {isAdded ? (
+            <motion.span
+              key="added"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="flex items-center justify-center gap-2 font-medium"
+            >
+              <Check className="w-4 h-4" /> Added
+            </motion.span>
+          ) : (
+            <motion.span
+              key="add"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center justify-center gap-2"
+            >
+              <ShoppingBag className="w-4 h-4" /> {product.customButtonText || 'Add to Cart'}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </Button>
+    </div>
+  );
 }
 
 function CountdownTimer({ endTime }: { endTime: string }) {
@@ -59,6 +170,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const toggleCart = useCartStore((state) => state.toggleCart);
   const [isAdded, setIsAdded] = useState(false);
+  const navigate = useNavigate();
+
+  const productUrl = `/products/${slugify(product.name)}`;
 
   const handleAddToCart = () => {
     addItem(product);
@@ -68,7 +182,22 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative flex flex-col h-full bg-white rounded-sm transition-all duration-300 hover:shadow-xl border border-transparent hover:border-gray-100">
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={(e) => {
+        const target = e.target as HTMLElement | null;
+        if (target?.closest('button,a,input,select,textarea')) return;
+        navigate(productUrl, { state: { product } });
+      }}
+      onKeyDown={(e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        navigate(productUrl, { state: { product } });
+      }}
+      className="group relative flex flex-col h-full ui-card ui-card-hover overflow-hidden cursor-pointer ui-focus-ring"
+      aria-label={`View ${product.name}`}
+    >
       {/* Image Container */}
       <div className="aspect-[3/4] overflow-hidden bg-gray-50 relative">
         <img
@@ -81,76 +210,23 @@ export function ProductCard({ product }: ProductCardProps) {
         />
         
         {/* Badge */}
-        {product.badge && (
-          <div className={`absolute top-0 left-0 text-white text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest ${product.badge.includes('OFF') ? 'bg-black' : 'bg-red-600'}`}>
-            {product.badge}
-          </div>
-        )}
+        {product.badge && <ProductBadge badge={product.badge} />}
 
         {/* Quick Actions - Heart */}
-        <button className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm text-gray-900 hover:text-red-600 hover:bg-white transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300">
+        <button type="button" aria-label="Add to wishlist" className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm text-gray-900 hover:text-red-600 hover:bg-white transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 ui-focus-ring">
           <Heart className="w-4 h-4" />
         </button>
 
         {/* Bottom Action Area */}
-         <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out bg-white/95 backdrop-blur-md border-t border-gray-100/50">
-          {product.variants && product.variants.length > 0 ? (
-            <div className="space-y-3">
-               <div className="flex flex-wrap gap-1.5 justify-center">
-                {product.variants.slice(0, 4).map((variant) => (
-                  <span 
-                    key={variant}
-                    className="text-[10px] border border-gray-200 px-2 py-1 rounded-sm hover:border-black transition-colors cursor-pointer bg-white text-gray-600 hover:text-black"
-                  >
-                    {variant}
-                  </span>
-                ))}
-                {product.variants.length > 4 && <span className="text-[10px] px-1 py-1 text-gray-400">+{product.variants.length - 4}</span>}
-              </div>
-              <Button 
-                 onClick={() => {}} 
-                 variant="outline"
-                 className="w-full text-xs uppercase tracking-widest h-9"
-              >
-                {product.customButtonText || 'View Options'}
-              </Button>
-            </div>
-          ) : (
-              <Button 
-                onClick={handleAddToCart} 
-                disabled={isAdded}
-                className={`w-full uppercase text-xs tracking-widest h-10 shadow-none transition-all duration-300 ${
-                  isAdded 
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-transparent' 
-                    : 'bg-gradient-to-r from-[#0066cc] to-[#20b2aa] hover:from-[#0052a3] hover:to-[#1a9a94] text-white border-transparent'
-                }`}
-              >
-                <AnimatePresence mode="wait">
-                  {isAdded ? (
-                    <motion.span
-                      key="added"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="flex items-center justify-center gap-2 font-medium"
-                    >
-                      <Check className="w-4 h-4" /> Added
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="add"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex items-center justify-center gap-2"
-                    >
-                       <ShoppingBag className="w-4 h-4" /> {product.customButtonText || 'Add to Cart'}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </Button>
-          )}
-        </div>
+        <ProductCardActions
+          product={product}
+          productUrl={productUrl}
+          hasVariants={Boolean(product.variants && product.variants.length > 0)}
+          variants={product.variants}
+          isAdded={isAdded}
+          onAddToCart={handleAddToCart}
+          onNavigate={navigate}
+        />
       </div>
       
       {/* Content */}

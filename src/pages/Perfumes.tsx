@@ -1,16 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { FilterSidebar } from '@/components/shop/FilterSidebar';
 import { SortDropdown } from '@/components/shop/SortDropdown';
 import { FeaturesSection } from '@/components/home/FeaturesSection';
 import { NewsletterSection } from '@/components/home/NewsletterSection';
 import { FAQSection } from '@/components/home/FAQSection';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
-import { SlidersHorizontal, Sparkles, Droplets } from 'lucide-react';
+import { SlidersHorizontal, Droplets } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Product } from '@/store/useCartStore';
-import { PRODUCTS } from '@/lib/data';
+import { useCatalogProducts } from '@/hooks/useCatalog';
 import { Seo } from '@/components/seo/Seo';
+import { PageHeader } from '@/components/ui/layout/PageHeader';
+import { PageContainer } from '@/components/ui/layout/PageContainer';
+import { Section } from '@/components/ui/layout/Section';
+import { useProductFilters } from '@/hooks/useProductFilters';
+import { DEFAULT_PRICE_RANGE } from '@/lib/constants';
+import { useCategoryConfig } from '@/hooks/useCategoryConfig';
 
 // Extend Product type for Perfume specific attributes
 interface PerfumeProduct extends Product {
@@ -20,8 +27,12 @@ interface PerfumeProduct extends Product {
   scentProfile?: string;
 }
 
-// Enhance existing perfume products with specific data
-const PERFUME_PRODUCTS: PerfumeProduct[] = PRODUCTS.filter(p => p.category === 'Perfumes').map(p => ({
+export function Perfumes() {
+  const config = useCategoryConfig('perfumes');
+  const allProducts = useCatalogProducts();
+  
+  // Enhance existing perfume products with specific data
+  const PERFUME_PRODUCTS: PerfumeProduct[] = allProducts.filter(p => p.category === 'Perfumes').map(p => ({
   ...p,
   concentration: p.name.includes('Extrait') ? 'Extrait de Parfum' : 'Eau de Parfum',
   gender: p.name.includes('Women') || p.name.includes('Love') || p.name.includes('Cherry') ? 'Feminine' : 
@@ -32,125 +43,86 @@ const PERFUME_PRODUCTS: PerfumeProduct[] = PRODUCTS.filter(p => p.category === '
   notes: p.description?.replace('Inspired by ', '').split('. ')[1]?.split(', ') || []
 }));
 
-const SCENT_PROFILES = [
-  { id: 'all', label: 'All Profiles' },
-  { id: 'Woody', label: 'Woody & Earthy' },
-  { id: 'Fruity/Fresh', label: 'Fresh & Fruity' },
-  { id: 'Amber/Floral', label: 'Amber & Floral' },
-  { id: 'Floral', label: 'Floral' },
-];
-
-export function Perfumes() {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
-  const [sortBy, setSortBy] = useState('featured');
+  const [priceRange, setPriceRange] = useState<[number, number]>(DEFAULT_PRICE_RANGE);
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'newest'>('featured');
   const [selectedProfile, setSelectedProfile] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('All Products');
 
   // Categories for Sidebar (Gender/Type)
-  const categories = ['All Products', 'Unisex', 'Feminine', 'Masculine'];
+  const categories = config.filters?.categories || ['All Products'];
+  const scentProfiles = config.filters?.scentProfiles || [];
 
-  // Filter Logic
-  const filteredProducts = useMemo(() => {
-    let result = [...PERFUME_PRODUCTS];
+  // Use the custom hook for filtering and sorting
+  const filteredProducts = useProductFilters({
+    products: PERFUME_PRODUCTS,
+    filters: {
+      selectedCategory,
+      priceRange,
+      sortBy,
+    },
+    customFilterFn: (product) => {
+      if (selectedProfile !== 'all') {
+        return (product as PerfumeProduct).scentProfile === selectedProfile;
+      }
+      return true;
+    },
+  });
 
-    // Filter by Scent Profile (Visual Filter)
-    if (selectedProfile !== 'all') {
-      result = result.filter(p => p.scentProfile === selectedProfile);
-    }
-
-    // Filter by Sidebar Category (Gender)
-    if (selectedCategory !== 'All Products') {
-      result = result.filter(p => p.gender === selectedCategory);
-    }
-
-    result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-
-    switch (sortBy) {
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-        result.reverse(); 
-        break;
-      default:
-        break;
-    }
-
-    return result;
-  }, [selectedProfile, selectedCategory, priceRange, sortBy]);
+  const handleResetFilters = () => {
+    setSelectedCategory('All Products');
+    setPriceRange(DEFAULT_PRICE_RANGE);
+    setSelectedProfile('all');
+  };
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="page-surface">
       <Seo
-        title="Perfumes — Scentiment"
-        description="Luxury perfumes inspired by iconic designer fragrances. Shop by scent profile and find your signature scent."
-        canonicalPath="/perfumes"
+        title={config.metadata.seo.title}
+        description={config.metadata.seo.description}
+        canonicalPath={config.metadata.seo.canonicalPath}
       />
-      {/* Luxury Hero Section */}
-      <div className="relative h-[65vh] lg:h-[80vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-           <img 
-             src="https://images.unsplash.com/photo-1615634260167-c8cdede054de?q=80&w=2000&auto=format&fit=crop" 
-             alt="Luxury Perfume" 
-             className="w-full h-full object-cover brightness-[0.4]"
-           />
-        </div>
-        
-        <div className="container-custom relative z-10 text-center px-4">
-           <motion.div
-             initial={{ opacity: 0, y: 30 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 1, ease: "easeOut" }}
-           >
-              <div className="inline-flex items-center gap-2 border border-white/30 rounded-full px-4 py-1.5 mb-6 bg-white/5 backdrop-blur-sm">
-                 <Sparkles className="w-3 h-3 text-yellow-200" />
-                 <span className="text-white/90 text-[10px] font-medium tracking-widest uppercase">
-                   Designer Inspired
-                 </span>
-              </div>
-              <h1 className="text-5xl md:text-8xl font-serif font-medium mb-6 text-white tracking-tight">
-                Fine Fragrance
-              </h1>
-              <p className="max-w-xl mx-auto text-white/80 text-lg font-light leading-relaxed tracking-wide mb-8">
-                Discover your signature scent. Luxury perfumes inspired by the world's most iconic designer fragrances, without the markup.
-              </p>
-              <Button className="bg-white text-black hover:bg-gray-100 border-none px-8 h-12 text-xs tracking-widest uppercase">
-                 Find Your Scent
-              </Button>
-           </motion.div>
-        </div>
-      </div>
 
-      {/* Scent Profile Filter */}
-      <section className="py-12 border-b border-gray-100 bg-white">
-         <div className="container-custom">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-                <h3 className="font-serif text-2xl text-gray-900">Olfactory Notes</h3>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide max-w-full">
-                  {SCENT_PROFILES.map((profile) => (
-                    <button 
-                      key={profile.id}
-                      onClick={() => setSelectedProfile(profile.id)}
-                      className={`
-                        whitespace-nowrap px-6 py-2.5 rounded-sm border text-xs uppercase tracking-widest transition-all duration-300
-                        ${selectedProfile === profile.id 
-                          ? 'bg-black text-white border-black' 
-                          : 'bg-transparent text-gray-500 border-gray-200 hover:border-black hover:text-black'}
-                      `}
-                    >
-                        {profile.label}
-                    </button>
-                  ))}
-                </div>
-            </div>
-         </div>
-      </section>
+      <PageHeader
+        eyebrow={config.metadata.header.eyebrow}
+        title={config.metadata.header.title}
+        description={config.metadata.header.description}
+        variant="hero"
+        media={{
+          type: 'image',
+          src: config.getBackgroundImage('landscape_16_9')
+        }}
+      />
 
-      <div className="container-custom py-16 lg:py-24">
+      {config.ui.sections?.olfactoryNotes && (
+        <Section 
+          id="scent-profiles" 
+          title={config.ui.sections.olfactoryNotes.title} 
+          description={config.ui.sections.olfactoryNotes.description} 
+          align="left"
+        >
+          <div className="flex max-w-full gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {scentProfiles.map((profile) => (
+            <button
+              key={profile.id}
+              onClick={() => setSelectedProfile(profile.id)}
+              className={`
+                whitespace-nowrap rounded-full border px-5 py-2.5 text-xs font-semibold uppercase tracking-widest transition-all duration-200
+                ${
+                  selectedProfile === profile.id
+                    ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                    : 'bg-white text-gray-600 border-black/10 hover:border-black/20 hover:text-gray-900'
+                }
+              `}
+            >
+              {profile.label}
+            </button>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      <PageContainer className="py-16 lg:py-20">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Filters Sidebar */}
           <FilterSidebar 
@@ -180,11 +152,14 @@ export function Perfumes() {
                   className="lg:hidden flex-1 flex items-center gap-2"
                   onClick={() => setIsMobileFilterOpen(true)}
                 >
-                  <SlidersHorizontal className="w-4 h-4" /> Filters
+                  <SlidersHorizontal className="w-4 h-4" /> {config.ui.toolbar.filtersButton}
                 </Button>
                 
                 <div className="flex-1 sm:flex-none flex justify-end">
-                   <SortDropdown sortBy={sortBy} onSortChange={setSortBy} />
+                   <SortDropdown 
+                     sortBy={sortBy} 
+                     onSortChange={(value) => setSortBy(value as typeof sortBy)} 
+                   />
                 </div>
               </div>
             </div>
@@ -206,10 +181,10 @@ export function Perfumes() {
                     {/* Premium Details Below Card */}
                     <div className="mt-4 text-center">
                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-widest mb-1">
-                         {product.gender} • {product.concentration}
+                         {(product as PerfumeProduct).gender} • {(product as PerfumeProduct).concentration}
                        </p>
                        <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                          {product.notes?.slice(0, 3).map((note, idx) => (
+                          {(product as PerfumeProduct).notes?.slice(0, 3).map((note: string, idx: number) => (
                              <span key={idx} className="text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded-sm">
                                {note}
                              </span>
@@ -220,63 +195,54 @@ export function Perfumes() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-32 bg-gray-50 rounded-sm border border-dashed border-gray-200">
-                <Droplets className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-6 font-light text-lg">No perfumes found matching your criteria.</p>
-                <Button 
-                  onClick={() => {
-                    setSelectedCategory('All Products');
-                    setPriceRange([0, 200]);
-                    setSelectedProfile('all');
-                  }}
-                  variant="outline"
-                  className="uppercase tracking-widest text-xs"
-                >
-                  Reset Collection
-                </Button>
-              </div>
+              <EmptyState
+                icon={<Droplets className="w-12 h-12 text-gray-300 mx-auto" />}
+                description={config.ui.emptyState.noProducts}
+                actionLabel={config.ui.emptyState.resetCollection}
+                onAction={handleResetFilters}
+                className="py-32 rounded-sm border border-dashed border-gray-200"
+              />
             )}
           </main>
         </div>
-      </div>
+      </PageContainer>
 
       {/* Scent Concentration Guide */}
-      <section className="py-24 bg-black text-white overflow-hidden relative">
-         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-         <div className="container-custom relative z-10">
-            <div className="text-center mb-16">
-               <span className="text-[#d4af37] font-medium tracking-[0.2em] uppercase text-xs mb-4 block">Know Your Scent</span>
-               <h2 className="text-3xl md:text-5xl font-serif font-medium">Fragrance Concentrations</h2>
+      {config.concentrationGuide && (
+        <section className="relative overflow-hidden bg-gray-950 py-20 text-white">
+          <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+          <PageContainer className="relative">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="ui-eyebrow text-white/70">{config.concentrationGuide.subtitle}</div>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-5xl">{config.concentrationGuide.title}</h2>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-               <div className="p-8 border border-white/10 bg-white/5 backdrop-blur-sm rounded-sm hover:bg-white/10 transition-colors">
-                  <div className="text-2xl font-serif mb-2 text-white">Eau de Toilette</div>
-                  <div className="text-[#d4af37] text-sm font-bold mb-4">5-15% Oil Concentration</div>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                     Light, fresh, and perfect for daily wear. Typically lasts 3-4 hours on the skin.
+
+            <div className="mt-12 grid grid-cols-1 gap-6 text-center md:grid-cols-3">
+              {config.concentrationGuide.items.map((item) => (
+                <div 
+                  key={item.name}
+                  className={`rounded-xl border p-7 backdrop-blur-sm transition-colors ${
+                    item.isStandard 
+                      ? 'relative border-white/20 bg-white/10 shadow-2xl' 
+                      : 'border-white/10 bg-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  {item.isStandard && (
+                    <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--ds-gold)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-black">
+                      Our standard
+                    </div>
+                  )}
+                  <div className={`font-semibold text-white ${item.isStandard ? 'text-2xl' : 'text-xl'}`}>{item.name}</div>
+                  <div className="mt-3 text-sm font-bold text-[color:var(--ds-gold)]">{item.concentration}</div>
+                  <p className={`mt-3 text-sm leading-relaxed ${item.isStandard ? 'text-white/80' : 'text-white/70'}`}>
+                    {item.description}
                   </p>
-               </div>
-               <div className="p-8 border border-white/20 bg-white/10 backdrop-blur-sm rounded-sm scale-105 shadow-2xl relative">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#d4af37] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
-                     Our Standard
-                  </div>
-                  <div className="text-3xl font-serif mb-2 text-white">Eau de Parfum</div>
-                  <div className="text-[#d4af37] text-sm font-bold mb-4">15-20% Oil Concentration</div>
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                     Rich, long-lasting, and intense. The gold standard for luxury fragrance, lasting 6-8 hours.
-                  </p>
-               </div>
-               <div className="p-8 border border-white/10 bg-white/5 backdrop-blur-sm rounded-sm hover:bg-white/10 transition-colors">
-                  <div className="text-2xl font-serif mb-2 text-white">Extrait de Parfum</div>
-                  <div className="text-[#d4af37] text-sm font-bold mb-4">20-40% Oil Concentration</div>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                     The purest and most potent form. incredibly long-lasting sillage that stays for 12+ hours.
-                  </p>
-               </div>
+                </div>
+              ))}
             </div>
-         </div>
-      </section>
+          </PageContainer>
+        </section>
+      )}
 
       {/* Why Choose Us */}
       <FeaturesSection />

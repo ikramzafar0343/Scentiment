@@ -1,11 +1,13 @@
 import { useCartStore } from '@/store/useCartStore';
-import { X, Minus, Plus, Trash2 } from 'lucide-react';
+import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './Button';
 import { formatPrice } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 export function CartDrawer() {
   const { isOpen, items, removeItem, updateQuantity, toggleCart, subtotal } = useCartStore();
+  const navigate = useNavigate();
 
   return (
     <AnimatePresence>
@@ -39,7 +41,7 @@ export function CartDrawer() {
               {items.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                    <ShoppingBagIcon className="w-8 h-8 text-gray-400" />
+                    <ShoppingBag className="w-8 h-8 text-gray-400" aria-hidden="true" />
                   </div>
                   <p className="text-gray-500">Your cart is empty.</p>
                   <Button onClick={toggleCart} variant="outline">
@@ -95,7 +97,14 @@ export function CartDrawer() {
                   <span className="font-bold text-lg">{formatPrice(subtotal())}</span>
                 </div>
                 <p className="text-xs text-gray-500 mb-4 text-center">Shipping and taxes calculated at checkout.</p>
-                <Button className="w-full" size="lg">
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={() => {
+                    toggleCart();
+                    navigate('/checkout');
+                  }}
+                >
                   Checkout
                 </Button>
               </div>
@@ -104,26 +113,5 @@ export function CartDrawer() {
         </>
       )}
     </AnimatePresence>
-  );
-}
-
-function ShoppingBagIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-      <path d="M3 6h18" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
-    </svg>
   );
 }

@@ -4,8 +4,7 @@
 :root {
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
-  
-  /* Brand Colors - Matching shared design */
+
   --primary: #0066cc;
   --primary-light: #e6f2ff;
   --primary-dark: #004499;
@@ -23,14 +22,12 @@
   --success: #22c55e;
   --error: #ef4444;
   --warning: #f59e0b;
-  
-  /* Legacy colors for compatibility */
+
   --color-primary: #1a1a1a;
   --color-secondary: #f8f8f8;
   --color-accent: #d4af37;
   --color-sand: #f8f5f2;
-  
-  /* Spacing */
+
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
@@ -38,28 +35,42 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
   --spacing-3xl: 4rem;
-  
-  /* Border radius */
+
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
-  
-  /* Shadows */
+
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
   --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
   --shadow-xl: 0 20px 40px rgba(0,0,0,0.2);
-  
-  /* Transitions */
+
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
-  
-  /* Animations */
+
   --animate-marquee: marquee 25s linear infinite;
   --animate-marquee-reverse: marquee-reverse 25s linear infinite;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  --ds-bg: var(--white);
+  --ds-surface: var(--white);
+  --ds-surface-alt: var(--color-sand);
+  --ds-border: rgba(0, 0, 0, 0.1);
+  --ds-text: #111827;
+  --ds-text-muted: #4b5563;
+  --ds-text-subtle: #6b7280;
+  --ds-primary: var(--primary);
+  --ds-primary-hover: #0052a3;
+  --ds-primary-active: #004080;
+  --ds-accent: var(--accent);
+  --ds-gold: var(--gold);
+  --ds-radius: 12px;
+  --ds-radius-sm: 8px;
+  --ds-shadow-card: 0 10px 25px rgba(0,0,0,0.08);
+  --ds-shadow-lift: 0 18px 40px -18px rgba(0,0,0,0.22);
+  --ds-ease-premium: cubic-bezier(0.21, 0.47, 0.32, 0.98);
 }
 
 @theme {
@@ -70,6 +81,18 @@
   --color-secondary: var(--color-secondary);
   --color-accent: var(--color-accent);
   --color-sand: var(--color-sand);
+
+  --color-bg: var(--ds-bg);
+  --color-surface: var(--ds-surface);
+  --color-surface-alt: var(--ds-surface-alt);
+  --color-border: var(--ds-border);
+  --color-text: var(--ds-text);
+  --color-text-muted: var(--ds-text-muted);
+  --color-brand: var(--ds-primary);
+  --color-brand-hover: var(--ds-primary-hover);
+  --color-brand-active: var(--ds-primary-active);
+  --color-accent-2: var(--ds-accent);
+  --color-gold: var(--ds-gold);
   
   --animate-marquee: var(--animate-marquee);
   --animate-marquee-reverse: var(--animate-marquee-reverse);
@@ -84,6 +107,11 @@
 @keyframes marquee-reverse {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(0); }
+}
+
+@keyframes hero-pan {
+  0% { transform: translate3d(-2%, -2%, 0) scale(1.08); }
+  100% { transform: translate3d(2%, 2%, 0) scale(1.14); }
 }
 
 body {
@@ -145,6 +173,68 @@ body::before {
     display: none;
   }
 
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .page-surface {
+    background-color: var(--ds-bg);
+    color: var(--ds-text);
+  }
+
+  .page-hero-surface {
+    background-color: var(--ds-surface-alt);
+  }
+
+  .ui-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.28em] text-gray-500;
+  }
+
+  .ui-h1 {
+    @apply text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl;
+  }
+
+  .ui-h2 {
+    @apply text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl;
+  }
+
+  .ui-lead {
+    @apply text-base leading-relaxed text-gray-600 sm:text-lg;
+  }
+
+  .ui-card {
+    @apply rounded-xl border border-black/10 bg-white/80 shadow-sm backdrop-blur;
+  }
+
+  .ui-card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .ui-focus-ring {
+    outline: none;
+  }
+
+  .ui-focus-ring:focus-visible {
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ds-primary) 32%, transparent);
+  }
+
+  .ui-menu-item {
+    @apply block w-full rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-black/[0.03] hover:text-gray-900;
+  }
+
+  .ui-menu-item:focus-visible {
+    background: color-mix(in oklab, #000000 4%, transparent);
+  }
+
+  .ui-input {
+    @apply w-full rounded-md border border-black/10 bg-white/90 px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition;
+  }
+
+  .ui-input:focus-visible {
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ds-primary) 35%, transparent);
+    border-color: color-mix(in oklab, var(--ds-primary) 70%, #ffffff);
+  }
+
   /* Hero gradient matching shared design */
   .hero-gradient {
     background: linear-gradient(135deg, #0066cc 0%, #004080 50%, #20b2aa 100%);
@@ -153,6 +243,11 @@ body::before {
 
   .hero-pattern {
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0C30 16.569 16.569 30 0 30c16.569 0 30 13.431 30 30 0-16.569 13.431-30 30-30C43.431 30 30 16.569 30 0z' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  .hero-media {
+    animation: hero-pan 22s var(--ds-ease-premium) infinite alternate;
+    will-change: transform;
   }
 
   /* Newsletter gradient matching shared design */
@@ -166,5 +261,11 @@ body::before {
     background: var(--primary);
     border-color: var(--primary);
     color: var(--white);
+  }
+
+  /* Ensure Tailwind py-4 utility works correctly (no custom overrides) */
+  .py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 }

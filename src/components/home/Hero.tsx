@@ -1,19 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { HiArrowRight, HiSparkles } from 'react-icons/hi';
 import { cn } from '@/lib/utils';
 import sampleImage from '@/assets/images/sample.png';
 import { Tilt } from '@/components/ui/motion/Tilt';
-
-const HERO_COPY = {
-  eyebrow: 'Scentiment',
-  headline: 'Transform your space with premium home fragrance.',
-  subtext:
-    'Discover luxury diffusers and hotel-inspired fragrance oils designed for modern living. Experience clean ingredients, fast shipping, and personalized support that makes fragrance effortless.',
-  primaryCta: 'Shop Collection',
-  secondaryCta: 'See how it works'
-};
+import { useHomeConfig } from '@/hooks/useHomeConfig';
 
 export function Hero() {
   const { scrollY } = useScroll();
@@ -46,9 +38,56 @@ export function Hero() {
     };
   }, [reduceMotion]);
 
+  const { hero, resolveBannerImage } = useHomeConfig();
+  const backgroundImage = resolveBannerImage(hero.backgroundImagePrompt);
+  const backgroundVideoRef = useRef<HTMLVideoElement>(null);
+  const [backgroundVideoPlaying, setBackgroundVideoPlaying] = useState(false);
+
+  useEffect(() => {
+    const video = backgroundVideoRef.current;
+    if (!video || reduceMotion) return;
+    
+    const playPromise = video.play();
+    if (playPromise) {
+      playPromise.catch(() => {
+        // Video autoplay failed, fallback to image
+      });
+    }
+  }, [reduceMotion]);
+
   return (
     <section aria-labelledby="home-hero" className="relative overflow-hidden hero-gradient">
       <div className="absolute inset-0">
+        {/* Background Video */}
+        {!reduceMotion && (
+          <video
+            ref={backgroundVideoRef}
+            className="absolute inset-0 h-full w-full object-cover opacity-20"
+            playsInline
+            muted
+            loop
+            autoPlay
+            preload="none"
+            onPlaying={() => setBackgroundVideoPlaying(true)}
+            onPause={() => setBackgroundVideoPlaying(false)}
+            onError={() => setBackgroundVideoPlaying(false)}
+          >
+            <source src="https://cdn.coverr.co/videos/coverr-lighting-a-candle-6698/1080p.mp4" type="video/mp4" />
+          </video>
+        )}
+        
+        {/* Background Image Fallback */}
+        <img
+          src={backgroundImage}
+          alt=""
+          className={cn(
+            'absolute inset-0 h-full w-full object-cover opacity-20',
+            !reduceMotion && backgroundVideoPlaying ? 'hidden' : ''
+          )}
+          loading="eager"
+          decoding="async"
+        />
+        
         <div className="absolute inset-0 hero-pattern" />
       </div>
 
@@ -56,16 +95,16 @@ export function Hero() {
         <div className="container-custom grid min-h-[680px] grid-cols-1 items-center gap-10 py-16 md:grid-cols-12 md:py-20">
           <motion.div style={{ opacity, y }} className="md:col-span-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 backdrop-blur-[10px] px-4 py-2 text-xs font-semibold tracking-widest text-white shadow-sm">
-              <Sparkles className="h-4 w-4 text-[#d4af37]" />
-              <span className="uppercase">{HERO_COPY.eyebrow}</span>
+              <HiSparkles className="h-4 w-4 text-[#d4af37]" />
+              <span className="uppercase">{hero.eyebrow}</span>
             </div>
 
             <h1 id="home-hero" className="mt-5 max-w-xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
-              {HERO_COPY.headline}
+              {hero.headline}
             </h1>
 
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg">
-              {HERO_COPY.subtext}
+              {hero.subtext}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -76,17 +115,17 @@ export function Hero() {
                   'hover:from-gray-50 hover:to-gray-100 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
                 )}
               >
-                {HERO_COPY.primaryCta}
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                {hero.primaryCta}
+                <HiArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <a
                 href="#how-it-works"
                 className={cn(
                   'inline-flex h-12 items-center justify-center rounded-md border-2 border-white bg-transparent px-7 text-sm font-semibold text-white transition-all duration-150',
-                  'hover:bg-white hover:text-[#0066cc] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
+                  'hover:bg-white hover:text-[color:var(--ds-primary)] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
                 )}
               >
-                {HERO_COPY.secondaryCta}
+                {hero.secondaryCta}
               </a>
             </div>
 

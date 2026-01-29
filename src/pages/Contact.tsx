@@ -1,6 +1,11 @@
 import { useState, FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Seo } from '@/components/seo/Seo';
+import { PageHeader } from '@/components/ui/layout/PageHeader';
+import { PageContainer } from '@/components/ui/layout/PageContainer';
+import { Card } from '@/components/ui/layout/Card';
+import { TextField } from '@/components/ui/form/TextField';
+import { TextArea } from '@/components/ui/form/TextArea';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -38,61 +43,69 @@ export function Contact() {
   };
 
   return (
-    <div className="container-custom py-16 max-w-2xl mx-auto">
+    <div className="page-surface">
       <Seo
         title="Contact — Scentiment"
         description="Need help choosing a scent or checking an order? Contact Scentiment and our team will respond quickly."
         canonicalPath="/contact"
       />
-      <h1 className="text-4xl font-bold text-center mb-8 uppercase tracking-widest">Contact Us</h1>
+
+      <PageHeader
+        eyebrow="Support"
+        title="Contact"
+        description="Need help choosing a scent or checking an order? Send a message and we’ll get back to you quickly."
+      />
       
-      {isSubmitted ? (
-        <div className="text-center bg-green-50 p-8 rounded-lg border border-green-100">
-          <h3 className="text-2xl font-bold text-green-800 mb-2">Message Sent!</h3>
-          <p className="text-green-700">Thank you for contacting Scentiment. We will get back to you shortly.</p>
-          <Button className="mt-6" onClick={() => setIsSubmitted(false)}>Send Another Message</Button>
+      <PageContainer className="py-12 sm:py-16">
+        <div className="mx-auto max-w-2xl">
+          {isSubmitted ? (
+            <Card className="p-8 text-center">
+              <h3 className="text-2xl font-semibold text-gray-900">Message sent</h3>
+              <p className="ui-lead mt-2">Thanks for reaching out. We’ll get back to you shortly.</p>
+              <Button className="mt-7" onClick={() => setIsSubmitted(false)}>
+                Send another message
+              </Button>
+            </Card>
+          ) : (
+            <Card className="p-6 sm:p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <TextField
+                  label="Name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  error={errors.name}
+                  autoComplete="name"
+                />
+
+                <TextField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  error={errors.email}
+                  autoComplete="email"
+                />
+
+                <TextArea
+                  label="Message"
+                  name="message"
+                  rows={6}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  error={errors.message}
+                />
+
+                <Button type="submit" className="w-full" size="lg">
+                  Send message
+                </Button>
+              </form>
+            </Card>
+          )}
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-            <input
-              type="text"
-              id="name"
-              className={`w-full px-4 py-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-1 focus:ring-black transition-colors`}
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-          </div>
-          
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              id="email"
-              className={`w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-1 focus:ring-black transition-colors`}
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-          </div>
-          
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-            <textarea
-              id="message"
-              rows={5}
-              className={`w-full px-4 py-3 border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-1 focus:ring-black transition-colors`}
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            />
-            {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
-          </div>
-          
-          <Button type="submit" className="w-full" size="lg">Send Message</Button>
-        </form>
-      )}
+      </PageContainer>
     </div>
   );
 }

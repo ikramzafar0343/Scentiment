@@ -1,56 +1,24 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Search, User } from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { HiShoppingBag, HiMenu, HiX, HiUser } from 'react-icons/hi';
+import { FcGoogle } from 'react-icons/fc';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/store/useCartStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SAMPLE_PRODUCT_IMAGE } from '@/lib/data';
 import { Marquee } from '@/components/ui/motion/Marquee';
+import { HeaderSearch } from '@/components/search/HeaderSearch';
+import { useHeaderConfig } from '@/hooks/useHeaderConfig';
+import { getIconById } from '@/configs/icons/iconRegistry';
+import { loginEmailPassword, signupEmailPassword } from '@/services/auth/auth.service';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useSellerStore } from '@/store/useSellerStore';
 
-function GoogleIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
-      <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.658 29.273 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.155 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917Z" />
-      <path fill="#FF3D00" d="M6.306 14.691 12.841 19.48C14.608 15.108 18.884 12 24 12c3.059 0 5.842 1.155 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4c-7.682 0-14.354 4.33-17.694 10.691Z" />
-      <path fill="#4CAF50" d="M24 44c5.165 0 9.86-1.977 13.409-5.195l-6.19-5.238C29.219 35.091 26.715 36 24 36c-5.252 0-9.62-3.317-11.283-7.946l-6.49 5.002C9.543 39.556 16.227 44 24 44Z" />
-      <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.03 12.03 0 0 1-4.084 5.567l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917Z" />
-    </svg>
-  );
-}
-
-const NAV_LINKS = [
-  { name: 'Shop All', href: '/shop' },
-  { name: 'NEW', href: '/new' },
-  { name: 'SALE', href: '/sale' },
-  { 
-    name: 'DIFFUSERS', 
-    href: '/collections/scent-diffusers',
-    badges: [
-      { text: '$4 OILS', color: 'bg-red-600' },
-      { text: 'ALMOST SOLD OUT', color: 'bg-red-600' }
-    ]
-  },
-  { 
-    name: 'DIFFUSER OILS', 
-    href: '/collections/fragrance-oils' 
-  },
-  { 
-    name: 'SCENT VOYAGE', 
-    href: '/collection/voyage',
-    badges: [
-      { text: 'NEW', color: 'bg-red-600' }
-    ]
-  },
-  { 
-    name: 'ROOM SPRAYS', 
-    href: '/collections/fragrance-room-sprays',
-    badges: [
-      { text: '50% OFF', color: 'bg-red-600' }
-    ]
-  },
-  { name: 'CANDLES', href: '/collections/candles' },
-  { name: 'PERFUMES', href: '/collections/perfumes' },
-];
+const ACCENT_CLASS: Record<'gold' | 'accent' | 'primary', string> = {
+  gold: '[color:var(--ds-gold)]',
+  accent: '[color:var(--ds-accent)]',
+  primary: '[color:var(--ds-primary)]',
+};
 
 function CountdownTimer() {
   const [time, setTime] = useState({ h: 11, m: 56, s: 51 });
@@ -68,17 +36,28 @@ function CountdownTimer() {
   }, []);
 
   return (
-    <div className="font-mono text-xl tracking-widest font-bold bg-gradient-to-r from-black via-[#d4af37] to-black bg-clip-text text-transparent">
+    <div className="font-mono text-xl tracking-widest font-bold bg-gradient-to-r from-black via-[color:var(--ds-gold)] to-black bg-clip-text text-transparent">
       {String(time.h).padStart(2, '0')}h:{String(time.m).padStart(2, '0')}m:{String(time.s).padStart(2, '0')}s
     </div>
   );
 }
 
 export function Header() {
+  const { navLinks, announcements, marqueeSpeed } = useHeaderConfig();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [accountMode, setAccountMode] = useState<'signin' | 'signup'>('signin');
+  const [authStatus, setAuthStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [authError, setAuthError] = useState<string>('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const setAuthSession = useAuthStore((s) => s.setSession);
+  const setSeller = useSellerStore((s) => s.setSeller);
   const totalItems = useCartStore((state) => state.totalItems());
   const toggleCart = useCartStore((state) => state.toggleCart);
 
@@ -107,11 +86,62 @@ export function Header() {
     };
   }, [isAccountOpen]);
 
+
   const handleGoogleSignIn = () => {
     const googleAuthUrl = (import.meta.env as Record<string, string | undefined>)[
       'VITE_GOOGLE_AUTH_URL'
     ];
     window.location.assign(googleAuthUrl ?? '/auth/google');
+  };
+
+  const canSubmit = useMemo(() => {
+    const e = email.trim();
+    return Boolean(e.includes('@') && password.trim().length >= 6);
+  }, [email, password]);
+
+  const resetAuthUi = () => {
+    setAuthStatus('idle');
+    setAuthError('');
+  };
+
+  const onSubmitEmailAuth = async () => {
+    resetAuthUi();
+    setAuthStatus('loading');
+    try {
+      const session =
+        accountMode === 'signup'
+          ? await signupEmailPassword({
+              email: email.trim(),
+              password: password.trim(),
+              firstName: firstName.trim() || undefined,
+              lastName: lastName.trim() || undefined,
+            })
+          : await loginEmailPassword({ email: email.trim(), password: password.trim() });
+
+      setAuthSession({ user: session.user, tokens: session.tokens });
+
+      // If admin, also set Seller store so seller pages render without placeholder state.
+      if (session.user.role === 'admin') {
+        setSeller({
+          id: session.user.id,
+          name: session.user.email.split('@')[0] || 'Admin',
+          email: session.user.email,
+          isVerified: true,
+          verificationStatus: 'approved',
+        });
+        setIsAccountOpen(false);
+        navigate('/seller/dashboard');
+        setAuthStatus('success');
+        return;
+      }
+
+      setAuthStatus('success');
+      setIsAccountOpen(false);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Authentication failed';
+      setAuthError(msg);
+      setAuthStatus('error');
+    }
   };
 
   return (
@@ -122,46 +152,39 @@ export function Header() {
           <div className="hidden md:block shrink-0">
             <CountdownTimer />
           </div>
-          <Marquee className="flex-1 text-[11px] tracking-[0.22em] uppercase" speed={26}>
-            <span className="inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
-              <span className="bg-gradient-to-r from-black via-[#d4af37] to-black bg-clip-text text-transparent font-semibold">
-                Winter Event: extra 20% off
+          <Marquee className="flex-1 text-[11px] tracking-[0.22em] uppercase" speed={marqueeSpeed}>
+            {announcements.map((item) => (
+              <span key={item.text} className="inline-flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--ds-gold)]" />
+                <span
+        className={cn(
+                    'bg-gradient-to-r from-black to-black bg-clip-text text-transparent font-semibold',
+                    `via-${ACCENT_CLASS[item.accent]}`
+                  )}
+                >
+                  {item.text}
+                </span>
               </span>
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
-              <span className="bg-gradient-to-r from-black via-[#20b2aa] to-black bg-clip-text text-transparent font-semibold">
-                Free shipping over €100
-              </span>
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
-              <span className="bg-gradient-to-r from-black via-[#0066cc] to-black bg-clip-text text-transparent font-semibold">
-                Limited drops weekly
-              </span>
-            </span>
+            ))}
           </Marquee>
 
           <div className="flex items-center gap-3 shrink-0">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Search">
-              <Search className="w-5 h-5 text-black" />
-            </button>
+            <HeaderSearch />
             <button
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Account"
               onClick={() => setIsAccountOpen(true)}
             >
-              <User className="w-5 h-5 text-black" />
+              <HiUser className="w-5 h-5 text-black" />
             </button>
             <button
               className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
               onClick={toggleCart}
               aria-label="Open cart"
             >
-              <ShoppingBag className="w-5 h-5 text-black" />
+              <HiShoppingBag className="w-5 h-5 text-black" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#0066cc] to-[#20b2aa] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg">
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[color:var(--ds-primary)] to-[color:var(--ds-accent)] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg">
                   {totalItems}
                 </span>
               )}
@@ -175,14 +198,14 @@ export function Header() {
         'bg-white/90 backdrop-blur-xl transition-all duration-300 border-b border-black/5 relative z-[50]',
         isScrolled ? 'shadow-sm py-2' : 'py-4'
       )}>
-        <div className="container-custom flex items-center gap-8">
+        <div className="container-custom flex items-center gap-8 relative">
           {/* Mobile Menu Button */}
           <button
             className="lg:hidden p-2 text-black"
             onClick={() => setIsMobileMenuOpen(true)}
             aria-label="Open menu"
           >
-            <Menu className="w-6 h-6" />
+            <HiMenu className="w-6 h-6" />
           </button>
 
           {/* Logo */}
@@ -190,42 +213,58 @@ export function Header() {
             Scentiment
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-6 flex-1">
-            <Link to="/shop" className="bg-gradient-to-r from-[#0066cc] to-[#20b2aa] text-white font-semibold px-6 py-2 rounded-md text-sm hover:from-[#0052a3] hover:to-[#1a9a94] transition-all duration-150 uppercase whitespace-nowrap shadow-sm hover:-translate-y-0.5 hover:shadow-lg">
-              SHOP NOW
-            </Link>
-            
-            <nav className="flex items-center gap-6">
-              {NAV_LINKS.map((link) => (
+          {/* Desktop Nav - Horizontal Slider */}
+          <div className="hidden lg:flex items-center gap-6 flex-1 min-w-0 overflow-visible">
+            <div className="relative flex-1 min-w-0">
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-white/90 to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-white/90 to-transparent" />
+
+              <nav
+                className="flex items-center gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-2"
+              >
+              {navLinks.map((link) => {
+                const Icon = getIconById(link.iconId);
+                return (
                 <div 
                   key={link.name} 
-                  className="relative group"
+                  className="relative group shrink-0"
                   onMouseEnter={() => setActiveMenu(link.name)}
                 >
-                  {/* Badges Container */}
-                  {link.badges && (
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 flex gap-1 whitespace-nowrap pointer-events-none">
-                      {link.badges.map((badge, idx) => (
-                        <span key={idx} className={cn(
-                          "text-[9px] font-bold text-white px-1 py-0.5 rounded-sm",
-                          badge.color
-                        )}>
-                          {badge.text}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  
                   <Link
                     to={link.href}
-                    className="text-sm font-bold text-black hover:text-gray-600 transition-colors uppercase whitespace-nowrap py-4"
+                    className={cn(
+                      'relative flex items-center gap-1.5 text-sm font-bold text-black hover:text-gray-600 transition-colors uppercase whitespace-nowrap',
+                      link.badges ? 'pt-8 pb-3' : 'py-4'
+                    )}
                   >
-                    {link.name}
+                    <Icon className="w-4 h-4" aria-hidden="true" />
+                    {link.badges && (
+                      <span
+                        className="absolute top-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+                        aria-hidden="true"
+                      >
+                        {link.badges.map((badge) => (
+                          <span
+                            key={badge.text}
+                            className={cn(
+                              'rounded-full px-2 py-0.5 text-[9px] font-extrabold leading-none text-white shadow-sm whitespace-nowrap',
+                              badge.colorClass
+                            )}
+                          >
+                            {badge.text}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                    <span>{link.name}</span>
+                    {link.badges && (
+                      <span className="sr-only">{link.badges.map((b) => b.text).join(', ')}</span>
+                    )}
                   </Link>
                 </div>
-              ))}
-            </nav>
+              )})}
+              </nav>
+            </div>
           </div>
         </div>
 
@@ -396,29 +435,29 @@ export function Header() {
             >
               <div className="container-custom flex gap-8">
                 {/* Sidebar Menu */}
-                <div className="w-1/5 flex flex-col gap-3 text-gray-500 text-sm">
-                  <Link to="/diffusers/all" className="hover:text-black transition-colors">Shop All Diffusers</Link>
-                  <Link to="/diffusers/starter-kit" className="hover:text-black transition-colors">Build Your Starter Kit</Link>
-                  <Link to="/diffusers/discovery-kits" className="hover:text-black transition-colors">Discovery Kits</Link>
-                  <Link to="/diffusers/car" className="flex items-center gap-2 hover:text-black transition-colors">
+                <div className="w-1/5 flex flex-col gap-1 text-gray-500 text-sm">
+                  <Link to="/diffusers/all" className="ui-menu-item ui-focus-ring">Shop All Diffusers</Link>
+                  <Link to="/diffusers/starter-kit" className="ui-menu-item ui-focus-ring">Build Your Starter Kit</Link>
+                  <Link to="/diffusers/discovery-kits" className="ui-menu-item ui-focus-ring">Discovery Kits</Link>
+                  <Link to="/diffusers/car" className="ui-menu-item ui-focus-ring flex items-center gap-2">
                     Car Diffuser 
-                    <span className="bg-red-600 text-white text-[10px] font-bold px-1 rounded">Sold Out</span>
+                    <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-extrabold leading-none text-white">Sold Out</span>
                   </Link>
-                  <Link to="/diffusers/reed" className="hover:text-black transition-colors">Reed Diffusers</Link>
+                  <Link to="/diffusers/reed" className="ui-menu-item ui-focus-ring">Reed Diffusers</Link>
                 </div>
 
                 {/* Products Grid */}
                 <div className="flex-1 grid grid-cols-4 gap-6">
                   {/* Diffuser Air 2 Discovery Kit */}
                   <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl p-6 mb-4 aspect-[3/4] flex items-center justify-center">
-                      <span className="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-2 py-1 rounded">72% OFF</span>
+                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
+                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">72% OFF</span>
                       <img 
                         src={SAMPLE_PRODUCT_IMAGE} 
                         alt="Diffuser Air 2" 
                         className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
                       />
-                      <button className="absolute bottom-3 right-3 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser Air 2">
                         +
                       </button>
                     </div>
@@ -428,14 +467,14 @@ export function Header() {
 
                   {/* Diffuser Mini 2 LE Discovery Kit */}
                   <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl p-6 mb-4 aspect-[3/4] flex items-center justify-center">
-                      <span className="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-2 py-1 rounded">57% OFF</span>
+                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
+                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">57% OFF</span>
                       <img 
                         src={SAMPLE_PRODUCT_IMAGE} 
                         alt="Diffuser Mini 2 LE" 
                         className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
                       />
-                      <button className="absolute bottom-3 right-3 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser Mini 2">
                         +
                       </button>
                     </div>
@@ -445,14 +484,14 @@ export function Header() {
 
                   {/* Diffuser Pro 2 */}
                   <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl p-6 mb-4 aspect-[3/4] flex items-center justify-center">
-                      <span className="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-2 py-1 rounded">88% OFF</span>
+                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
+                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">88% OFF</span>
                       <img 
                         src={SAMPLE_PRODUCT_IMAGE} 
                         alt="Diffuser Pro 2" 
                         className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
                       />
-                      <button className="absolute bottom-3 right-3 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser Pro 2">
                         +
                       </button>
                     </div>
@@ -462,14 +501,14 @@ export function Header() {
 
                   {/* Diffuser HVAC 2 */}
                   <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl p-6 mb-4 aspect-[3/4] flex items-center justify-center">
-                      <span className="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-2 py-1 rounded">75% OFF</span>
+                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
+                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">75% OFF</span>
                       <img 
                         src={SAMPLE_PRODUCT_IMAGE} 
                         alt="Diffuser HVAC 2" 
                         className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
                       />
-                      <button className="absolute bottom-3 right-3 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser HVAC 2">
                         +
                       </button>
                     </div>
@@ -532,10 +571,10 @@ export function Header() {
               onMouseLeave={() => setActiveMenu(null)}
             >
               <div className="container-custom">
-                <div className="flex flex-col gap-4 text-gray-600 text-base">
-                  <Link to="/collections/fragrance-room-sprays" className="hover:text-black transition-colors">Shop All Room Sprays</Link>
-                  <Link to="/sprays/hotel" className="hover:text-black transition-colors">Hotel Room Sprays</Link>
-                  <Link to="/sprays/designer" className="hover:text-black transition-colors">Designer Room Sprays</Link>
+                <div className="flex flex-col gap-1 text-gray-600 text-base max-w-sm">
+                  <Link to="/collections/fragrance-room-sprays" className="ui-menu-item ui-focus-ring">Shop All Room Sprays</Link>
+                  <Link to="/sprays/hotel" className="ui-menu-item ui-focus-ring">Hotel Room Sprays</Link>
+                  <Link to="/sprays/designer" className="ui-menu-item ui-focus-ring">Designer Room Sprays</Link>
                 </div>
               </div>
             </motion.div>
@@ -553,10 +592,10 @@ export function Header() {
               onMouseLeave={() => setActiveMenu(null)}
             >
               <div className="container-custom">
-                <div className="flex flex-col gap-4 text-gray-600 text-base">
-                  <Link to="/collections/candles" className="hover:text-black transition-colors">Shop All Candles</Link>
-                  <Link to="/candles/hotel" className="hover:text-black transition-colors">Hotel Candles</Link>
-                  <Link to="/candles/designer" className="hover:text-black transition-colors">Designer Candles</Link>
+                <div className="flex flex-col gap-1 text-gray-600 text-base max-w-sm">
+                  <Link to="/collections/candles" className="ui-menu-item ui-focus-ring">Shop All Candles</Link>
+                  <Link to="/candles/hotel" className="ui-menu-item ui-focus-ring">Hotel Candles</Link>
+                  <Link to="/candles/designer" className="ui-menu-item ui-focus-ring">Designer Candles</Link>
                 </div>
               </div>
             </motion.div>
@@ -643,20 +682,23 @@ export function Header() {
               <div className="flex justify-between items-center mb-8">
                 <span className="text-xl font-bold tracking-widest uppercase">Menu</span>
                 <button onClick={() => setIsMobileMenuOpen(false)}>
-                  <X className="w-6 h-6" />
+                  <HiX className="w-6 h-6" />
                 </button>
               </div>
               <div className="flex flex-col gap-6">
-                {NAV_LINKS.map((link) => (
+                {navLinks.map((link) => {
+                  const Icon = getIconById(link.iconId);
+                  return (
                   <Link
                     key={link.name}
                     to={link.href}
-                    className="text-lg font-medium text-gray-800 border-b border-gray-100 pb-2"
+                    className="flex items-center gap-2 text-lg font-medium text-gray-800 border-b border-gray-100 pb-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
+                    <Icon className="w-5 h-5" />
                     {link.name}
                   </Link>
-                ))}
+                )})}
               </div>
             </motion.div>
           </>
@@ -692,7 +734,7 @@ export function Header() {
                   aria-label="Close"
                   onClick={() => setIsAccountOpen(false)}
                 >
-                  <X className="w-5 h-5 text-black" />
+                  <HiX className="w-5 h-5 text-black" />
                 </button>
               </div>
 
@@ -702,9 +744,124 @@ export function Header() {
                   onClick={handleGoogleSignIn}
                   className="w-full rounded-sm border border-black/15 bg-white px-4 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-black hover:bg-black/5 transition-colors flex items-center justify-center gap-3"
                 >
-                  <GoogleIcon className="h-5 w-5" />
+                  <FcGoogle className="h-5 w-5" aria-hidden="true" />
                   <span>Sign in with Google</span>
                 </button>
+
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountMode('signin');
+                      resetAuthUi();
+                    }}
+                    className={cn(
+                      'flex-1 rounded-full border px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.22em] transition-colors',
+                      accountMode === 'signin'
+                        ? 'border-black bg-black text-white'
+                        : 'border-black/15 bg-white text-black hover:bg-black/5'
+                    )}
+                  >
+                    Sign in
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountMode('signup');
+                      resetAuthUi();
+                    }}
+                    className={cn(
+                      'flex-1 rounded-full border px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.22em] transition-colors',
+                      accountMode === 'signup'
+                        ? 'border-black bg-black text-white'
+                        : 'border-black/15 bg-white text-black hover:bg-black/5'
+                    )}
+                  >
+                    Create account
+                  </button>
+                </div>
+
+                <div className="mt-5 rounded-xl border border-black/10 bg-white p-4">
+                  <div className="grid gap-3">
+                    {accountMode === 'signup' ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        <label className="grid gap-1">
+                          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-black/70">
+                            First name
+                          </span>
+                          <input
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            className="ui-input h-11"
+                            placeholder="First name"
+                            autoComplete="given-name"
+                          />
+                        </label>
+                        <label className="grid gap-1">
+                          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-black/70">
+                            Last name
+                          </span>
+                          <input
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className="ui-input h-11"
+                            placeholder="Last name"
+                            autoComplete="family-name"
+                          />
+                        </label>
+                      </div>
+                    ) : null}
+
+                    <label className="grid gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-black/70">
+                        Email
+                      </span>
+                      <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="ui-input h-11"
+                        placeholder="you@example.com"
+                        inputMode="email"
+                        autoComplete="email"
+                      />
+                    </label>
+
+                    <label className="grid gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-black/70">
+                        Password
+                      </span>
+                      <input
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        type="password"
+                        className="ui-input h-11"
+                        placeholder="Minimum 6 characters"
+                        autoComplete={accountMode === 'signup' ? 'new-password' : 'current-password'}
+                      />
+                    </label>
+
+                    {authStatus === 'error' ? (
+                      <div className="text-[12px] text-red-600">{authError}</div>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      disabled={!canSubmit || authStatus === 'loading'}
+                      onClick={onSubmitEmailAuth}
+                      className={cn(
+                        'mt-2 h-12 w-full rounded-full px-4 text-[11px] font-extrabold uppercase tracking-[0.22em] text-white shadow-sm transition-all',
+                        'bg-gradient-to-r from-[color:var(--ds-primary)] to-[color:var(--ds-accent)] hover:opacity-95',
+                        (!canSubmit || authStatus === 'loading') && 'opacity-50 cursor-not-allowed'
+                      )}
+                    >
+                      {authStatus === 'loading'
+                        ? 'Please wait…'
+                        : accountMode === 'signup'
+                          ? 'Create account'
+                          : 'Sign in'}
+                    </button>
+                  </div>
+                </div>
 
                 <p className="mt-5 text-[11px] leading-relaxed text-black/60">
                   By clicking Continue you agree to our Privacy Policy and Terms &amp; Conditions.

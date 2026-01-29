@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, CreditCard, ArrowUp, ShieldCheck, Truck } from 'lucide-react';
+import { HiArrowUp, HiShieldCheck, HiTruck } from 'react-icons/hi';
+import { FaInstagram, FaFacebook, FaTwitter, FaCreditCard } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 export function Footer() {
@@ -29,21 +30,21 @@ export function Footer() {
                 aria-label="Instagram"
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/75 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
-                <Instagram className="h-5 w-5" />
+                <FaInstagram className="h-5 w-5" />
               </a>
               <a
                 href="#"
                 aria-label="Facebook"
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/75 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
-                <Facebook className="h-5 w-5" />
+                <FaFacebook className="h-5 w-5" />
               </a>
               <a
                 href="#"
                 aria-label="Twitter"
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/75 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
-                <Twitter className="h-5 w-5" />
+                <FaTwitter className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -95,9 +96,9 @@ export function Footer() {
           <p>&copy; {new Date().getFullYear()} Scentiment. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-white/35" aria-label="Support and payments">
-              <ShieldCheck className="h-5 w-5" />
-              <Truck className="h-5 w-5" />
-              <CreditCard className="h-5 w-5" />
+              <HiShieldCheck className="h-5 w-5" />
+              <HiTruck className="h-5 w-5" />
+              <FaCreditCard className="h-5 w-5" />
             </div>
             <span className="text-xs font-semibold uppercase tracking-widest text-white/70">USD</span>
           </div>
@@ -109,7 +110,7 @@ export function Footer() {
           className="absolute right-6 top-6 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white shadow-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           aria-label="Back to top"
         >
-          <ArrowUp className="h-5 w-5" />
+          <HiArrowUp className="h-5 w-5" />
         </motion.button>
       </div>
     </footer>

@@ -1,5 +1,6 @@
 import { motion, useInView, UseInViewOptions, TargetAndTransition } from 'framer-motion';
 import { useRef, ReactNode } from 'react';
+import { MOTION_DURATION, MOTION_EASE_PREMIUM } from '@/lib/motion';
 
 interface FadeInProps {
   children: ReactNode;
@@ -16,7 +17,7 @@ export function FadeIn({
   children, 
   className = '', 
   delay = 0, 
-  duration = 0.8,
+  duration = MOTION_DURATION.slow,
   direction = 'up',
   fullWidth = false,
   viewport = { once: true, margin: "-10%" },
@@ -30,10 +31,18 @@ export function FadeIn({
     if (scale) state.scale = 0.95;
     
     switch (direction) {
-      case 'up': state.y = 40; break;
-      case 'down': state.y = -40; break;
-      case 'left': state.x = 40; break;
-      case 'right': state.x = -40; break;
+      case 'up':
+        state.y = 18;
+        break;
+      case 'down':
+        state.y = -18;
+        break;
+      case 'left':
+        state.x = 18;
+        break;
+      case 'right':
+        state.x = -18;
+        break;
     }
     return state;
   };
@@ -50,7 +59,7 @@ export function FadeIn({
         transition={{ 
           duration: duration, 
           delay: delay, 
-          ease: [0.21, 0.47, 0.32, 0.98] // Customized easing for premium feel
+          ease: MOTION_EASE_PREMIUM
         }}
       >
         {children}

@@ -42,7 +42,7 @@ export function SortDropdown({ sortBy, onSortChange }: SortDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 shadow-xl rounded-sm py-1 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+        <div className="absolute right-0 top-full mt-2 w-56 ui-card py-1 shadow-xl origin-top-right">
           {SORT_OPTIONS.map((option) => (
             <button
               key={option.value}
@@ -51,8 +51,8 @@ export function SortDropdown({ sortBy, onSortChange }: SortDropdownProps) {
                 setIsOpen(false);
               }}
               className={cn(
-                "w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors",
-                sortBy === option.value ? "font-bold text-black bg-gray-50" : "text-gray-600"
+                "w-full text-left px-4 py-2.5 text-sm hover:bg-black/[0.03] transition-colors",
+                sortBy === option.value ? "font-bold text-gray-900 bg-black/[0.03]" : "text-gray-600"
               )}
             >
               {option.label}

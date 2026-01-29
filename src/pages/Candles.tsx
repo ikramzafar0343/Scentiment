@@ -1,16 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { FilterSidebar } from '@/components/shop/FilterSidebar';
 import { SortDropdown } from '@/components/shop/SortDropdown';
 import { FeaturesSection } from '@/components/home/FeaturesSection';
 import { NewsletterSection } from '@/components/home/NewsletterSection';
 import { FAQSection } from '@/components/home/FAQSection';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 import { SlidersHorizontal, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Product } from '@/store/useCartStore';
-import { PRODUCTS } from '@/lib/data';
+import { useCatalogProducts } from '@/hooks/useCatalog';
 import { Seo } from '@/components/seo/Seo';
+import { PageHeader } from '@/components/ui/layout/PageHeader';
+import { PageContainer } from '@/components/ui/layout/PageContainer';
+import { Section } from '@/components/ui/layout/Section';
+import { useProductFilters } from '@/hooks/useProductFilters';
+import { CANDLE_PRICE_RANGE } from '@/lib/constants';
+import { useCategoryConfig } from '@/hooks/useCategoryConfig';
 
 // Extend Product type for Candles specific attributes
 interface CandleProduct extends Product {
@@ -20,8 +27,12 @@ interface CandleProduct extends Product {
   mood?: string;
 }
 
-// Enhance existing candle products with specific data
-const CANDLE_PRODUCTS: CandleProduct[] = PRODUCTS.filter(p => p.category === 'Candles').map(p => ({
+export function Candles() {
+  const config = useCategoryConfig('candles');
+  const allProducts = useCatalogProducts();
+  
+  // Enhance existing candle products with specific data
+  const CANDLE_PRODUCTS: CandleProduct[] = allProducts.filter(p => p.category === 'Candles').map(p => ({
   ...p,
   burnTime: '50-60 Hours',
   waxType: 'Soy Blend',
@@ -34,128 +45,86 @@ const CANDLE_PRODUCTS: CandleProduct[] = PRODUCTS.filter(p => p.category === 'Ca
         p.name.includes('Secret') || p.name.includes('Love') ? 'Romantic' : 'Cozy'
 }));
 
-const SCENT_FAMILIES = [
-  { id: 'all', label: 'All Scents', color: 'bg-gray-100' },
-  { id: 'Woody', label: 'Woody', color: 'bg-[#8B5A2B]' },
-  { id: 'Fresh', label: 'Fresh', color: 'bg-[#A0C4FF]' },
-  { id: 'Floral', label: 'Floral', color: 'bg-[#FFB7B2]' },
-  { id: 'Oriental', label: 'Oriental', color: 'bg-[#D4AF37]' },
-];
-
-export function Candles() {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
-  const [sortBy, setSortBy] = useState('featured');
+  const [priceRange, setPriceRange] = useState<[number, number]>(CANDLE_PRICE_RANGE);
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'newest'>('featured');
   const [selectedFamily, setSelectedFamily] = useState('all');
-  // We can use the category filter from Sidebar for "Mood" or keep it standard
   const [selectedCategory, setSelectedCategory] = useState('All Products');
 
   // Categories for Sidebar (Standard + Moods if we want)
-  const categories = ['All Products', 'Relaxing', 'Energizing', 'Romantic', 'Cozy'];
+  const categories = config.filters?.categories || ['All Products'];
+  const scentFamilies = config.filters?.scentFamilies || [];
 
-  // Filter Logic
-  const filteredProducts = useMemo(() => {
-    let result = [...CANDLE_PRODUCTS];
+  // Use the custom hook for filtering and sorting
+  const filteredProducts = useProductFilters({
+    products: CANDLE_PRODUCTS,
+    filters: {
+      selectedCategory,
+      priceRange,
+      sortBy,
+    },
+    customFilterFn: (product) => {
+      if (selectedFamily !== 'all') {
+        return (product as CandleProduct).scentFamily === selectedFamily;
+      }
+      return true;
+    },
+  });
 
-    // Filter by Scent Family (Visual Filter)
-    if (selectedFamily !== 'all') {
-      result = result.filter(p => p.scentFamily === selectedFamily);
-    }
-
-    // Filter by Sidebar Category (acting as Mood filter here for variety)
-    if (selectedCategory !== 'All Products') {
-      result = result.filter(p => p.mood === selectedCategory);
-    }
-
-    result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-
-    switch (sortBy) {
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-        result.reverse(); 
-        break;
-      default:
-        break;
-    }
-
-    return result;
-  }, [selectedFamily, selectedCategory, priceRange, sortBy]);
+  const handleResetFilters = () => {
+    setSelectedCategory('All Products');
+    setPriceRange(CANDLE_PRICE_RANGE);
+    setSelectedFamily('all');
+  };
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="page-surface">
       <Seo
-        title="Candles — Scentiment"
-        description="Hand-poured luxury candles crafted to transform your space with warmth, elegance, and unforgettable fragrance."
-        canonicalPath="/candles"
+        title={config.metadata.seo.title}
+        description={config.metadata.seo.description}
+        canonicalPath={config.metadata.seo.canonicalPath}
       />
-      {/* Cinematic Hero Section */}
-      <div className="relative h-[60vh] lg:h-[75vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          {/* Placeholder for a video or high-end cozy image */}
-           <img 
-             src="https://images.unsplash.com/photo-1603006905003-be475563bc59?q=80&w=2000&auto=format&fit=crop" 
-             alt="Luxury Candle Ambience" 
-             className="w-full h-full object-cover brightness-[0.5]"
-           />
-        </div>
-        
-        <div className="container-custom relative z-10 text-center px-4">
-           <motion.div
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 1, ease: "easeOut" }}
-           >
-              <span className="text-orange-100/90 font-medium tracking-[0.3em] uppercase text-xs md:text-sm mb-4 block">
-                Hand-Poured Luxury
-              </span>
-              <h1 className="text-5xl md:text-7xl font-serif font-light mb-8 text-white tracking-wide">
-                The Candle Collection
-              </h1>
-              <p className="max-w-xl mx-auto text-white/90 text-lg font-light leading-relaxed tracking-wide">
-                Illuminate your senses. Our soy-blend candles are crafted to transform your space with warmth, elegance, and unforgettable fragrance.
-              </p>
-           </motion.div>
-        </div>
-      </div>
 
-      {/* Scent Family Visual Filter */}
-      <section className="py-12 border-b border-gray-100 bg-[#fffbf7]">
-         <div className="container-custom">
-            <div className="text-center mb-10">
-               <h3 className="font-serif text-2xl text-gray-900 mb-2">Find Your Scent</h3>
-               <p className="text-gray-500 text-sm">Explore our fragrances by olfactory family</p>
-            </div>
-            
-            <div className="flex flex-wrap gap-6 justify-center px-4">
-               {SCENT_FAMILIES.map((family) => (
-                 <button 
-                   key={family.id}
-                   onClick={() => setSelectedFamily(family.id)}
-                   className={`
-                     relative flex items-center gap-3 px-6 py-3 rounded-full border transition-all duration-300
-                     ${selectedFamily === family.id 
-                       ? 'bg-gray-900 text-white border-gray-900 shadow-lg scale-105' 
-                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:shadow-md'}
-                   `}
-                 >
-                    {family.id !== 'all' && (
-                      <span className={`w-3 h-3 rounded-full ${family.color}`}></span>
-                    )}
-                    <span className="text-xs uppercase tracking-widest font-medium">
-                      {family.label}
-                    </span>
-                 </button>
-               ))}
-            </div>
-         </div>
-      </section>
+      <PageHeader
+        eyebrow={config.metadata.header.eyebrow}
+        title={config.metadata.header.title}
+        description={config.metadata.header.description}
+        variant="hero"
+        media={{
+          type: 'image',
+          src: config.getBackgroundImage('landscape_16_9')
+        }}
+      />
 
-      <div className="container-custom py-16 lg:py-24">
+      {config.ui.sections?.findYourScent && (
+        <Section 
+          title={config.ui.sections.findYourScent.title} 
+          description={config.ui.sections.findYourScent.description} 
+          className="bg-[color:var(--ds-surface-alt)]"
+        >
+          <div className="flex flex-wrap justify-center gap-3">
+            {scentFamilies.map((family) => (
+            <button
+              key={family.id}
+              onClick={() => setSelectedFamily(family.id)}
+              className={`
+                relative inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-xs font-semibold uppercase tracking-widest transition-all duration-200
+                ${
+                  selectedFamily === family.id
+                    ? 'bg-gray-900 text-white border-gray-900 shadow-md'
+                    : 'bg-white text-gray-600 border-black/10 hover:border-black/20 hover:shadow-sm'
+                }
+              `}
+            >
+              {family.id !== 'all' ? <span className={`h-2.5 w-2.5 rounded-full ${family.color}`} /> : null}
+              <span>{family.label}</span>
+            </button>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      <PageContainer className="py-16 lg:py-20">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Filters Sidebar */}
           <FilterSidebar 
@@ -185,11 +154,14 @@ export function Candles() {
                   className="lg:hidden flex-1 flex items-center gap-2"
                   onClick={() => setIsMobileFilterOpen(true)}
                 >
-                  <SlidersHorizontal className="w-4 h-4" /> Filters
+                  <SlidersHorizontal className="w-4 h-4" /> {config.ui.toolbar.filtersButton}
                 </Button>
                 
                 <div className="flex-1 sm:flex-none flex justify-end">
-                   <SortDropdown sortBy={sortBy} onSortChange={setSortBy} />
+                   <SortDropdown 
+                     sortBy={sortBy} 
+                     onSortChange={(value) => setSortBy(value as typeof sortBy)} 
+                   />
                 </div>
               </div>
             </div>
@@ -208,86 +180,70 @@ export function Candles() {
                     <ProductCard product={product} />
                     {/* Extra details for premium feel */}
                     <div className="mt-3 flex items-center justify-center gap-4 text-[10px] text-gray-400 uppercase tracking-widest">
-                       <span className="flex items-center gap-1"><Flame className="w-3 h-3" /> {product.burnTime}</span>
+                       <span className="flex items-center gap-1"><Flame className="w-3 h-3" /> {(product as CandleProduct).burnTime}</span>
                        <span>|</span>
-                       <span>{product.scentFamily}</span>
+                       <span>{(product as CandleProduct).scentFamily}</span>
                     </div>
                   </motion.div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-32 bg-gray-50 rounded-sm border border-dashed border-gray-200">
-                <Flame className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-6 font-light text-lg">No candles found matching your mood.</p>
-                <Button 
-                  onClick={() => {
-                    setSelectedCategory('All Products');
-                    setPriceRange([0, 100]);
-                    setSelectedFamily('all');
-                  }}
-                  variant="outline"
-                  className="uppercase tracking-widest text-xs"
-                >
-                  Reset Collection
-                </Button>
-              </div>
+              <EmptyState
+                icon={<Flame className="w-12 h-12 text-gray-300 mx-auto" />}
+                description={config.ui.emptyState.noProducts}
+                actionLabel={config.ui.emptyState.resetCollection}
+                onAction={handleResetFilters}
+                className="py-32 rounded-sm border border-dashed border-gray-200"
+              />
             )}
           </main>
         </div>
-      </div>
+      </PageContainer>
 
-      {/* Editorial Section: Candle Care */}
-      <section className="py-24 bg-[#f4f1ea] text-gray-900 overflow-hidden relative">
-        <div className="container-custom relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-             <div className="order-2 md:order-1 relative">
-                <div className="absolute -top-10 -left-10 w-full h-full border border-gray-400/30 rounded-full rounded-tr-none z-0"></div>
-                <img 
-                   src="https://images.unsplash.com/photo-1602825266977-166168e92822?q=80&w=800&auto=format&fit=crop" 
-                   alt="Candle Care" 
-                   className="relative z-10 w-full h-auto shadow-xl rounded-sm"
-                />
-             </div>
-             
-             <div className="order-1 md:order-2">
-                <span className="text-gray-500 font-medium tracking-[0.2em] uppercase text-xs mb-6 block">
-                  The Art of Wax
-                </span>
-                <h2 className="text-4xl md:text-5xl font-serif font-medium mb-8 leading-tight">
-                  Candle Care <br/><i className="font-light text-gray-600">Rituals</i>
-                </h2>
-                <ul className="space-y-6 text-gray-600 font-light">
-                  <li className="flex gap-4">
-                    <span className="text-2xl font-serif opacity-30">01</span>
-                    <div>
-                      <strong className="block text-gray-900 text-sm uppercase tracking-wide mb-1">Trim the Wick</strong>
-                      <p>Always trim the wick to 1/4 inch before every burn to ensure an even, smoke-free flame.</p>
-                    </div>
-                  </li>
-                  <li className="flex gap-4">
-                    <span className="text-2xl font-serif opacity-30">02</span>
-                    <div>
-                      <strong className="block text-gray-900 text-sm uppercase tracking-wide mb-1">The First Burn</strong>
-                      <p>Allow the wax to melt to the edges of the jar during the first burn to prevent tunneling.</p>
-                    </div>
-                  </li>
-                  <li className="flex gap-4">
-                    <span className="text-2xl font-serif opacity-30">03</span>
-                    <div>
-                      <strong className="block text-gray-900 text-sm uppercase tracking-wide mb-1">Safety First</strong>
-                      <p>Never leave a burning candle unattended and keep away from drafts, pets, and children.</p>
-                    </div>
-                  </li>
-                </ul>
-                <div className="mt-10">
-                   <Button variant="outline" className="border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white uppercase tracking-widest text-xs px-8">
-                     Shop Accessories
-                   </Button>
+      {config.guideContent && (
+        <section className="bg-[color:var(--ds-surface-alt)] py-20">
+          <PageContainer>
+            <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+              <div className="order-2 md:order-1">
+                <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg">
+                  <img
+                    src={config.resolveDestinationImage('photorealistic premium candle care scene, luxury candle jar, wick trimmer, warm soft light, cozy editorial styling, high detail, 35mm', 'square')}
+                    alt="Candle care"
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
-             </div>
-          </div>
-        </div>
-      </section>
+              </div>
+
+              <div className="order-1 md:order-2">
+                <div className="ui-eyebrow">{config.guideContent.subtitle}</div>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
+                  {config.guideContent.title} <span className="font-serif italic text-gray-700">rituals</span>
+                </h2>
+                <div className="mt-6 space-y-5 text-gray-600">
+                  {config.guideContent.items.map((item) => (
+                    <div key={item.number} className="flex gap-4">
+                      <div className="text-sm font-semibold text-gray-400">{item.number}</div>
+                      <div>
+                        <div className="text-sm font-semibold uppercase tracking-wide text-gray-900">{item.title}</div>
+                        <p className="mt-1 text-sm leading-relaxed">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {config.guideContent.ctaLabel && (
+                  <div className="mt-8">
+                    <Button variant="outline" className="px-8 text-xs uppercase tracking-widest">
+                      {config.guideContent.ctaLabel}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </PageContainer>
+        </section>
+      )}
 
       {/* Why Choose Us */}
       <FeaturesSection />

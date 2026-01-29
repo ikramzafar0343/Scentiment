@@ -142,16 +142,23 @@ This project is configured for deployment on [Render](https://render.com/) with 
 
 ### Prerequisites
 
-1. **MongoDB Database**
-   - Create a MongoDB database on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) (recommended)
-   - Or use Render's MongoDB service
+1. **Render Account**
+   - Sign up for a free account at [Render](https://render.com/)
+   - **Note:** Free tier is available - no billing required!
+   - Free tier limitations:
+     - Backend services spin down after 15 minutes of inactivity (first request may be slow)
+     - Static sites are always free and always available
+
+2. **MongoDB Database**
+   - Create a MongoDB database on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) (recommended - free tier available)
+   - Or use Render's MongoDB service (requires paid plan)
    - Get your connection string (MONGODB_URI)
 
-2. **Redis** (Optional)
+3. **Redis** (Optional)
    - Create a Redis instance on Render or use an external service
-   - Get your Redis URL
+   - Not required - app works without Redis (uses in-memory cache)
 
-3. **Stripe Account** (Optional, for payments)
+4. **Stripe Account** (Optional, for payments)
    - Create a Stripe account and get your secret key
 
 ### Deployment Steps

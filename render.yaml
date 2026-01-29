@@ -3,7 +3,8 @@ services:
   - type: web
     name: scentiment-backend
     env: node
-    plan: starter
+    # Note: Free tier - service spins down after 15 min of inactivity
+    # Remove this comment and add 'plan: starter' if you upgrade to paid plan
     buildCommand: cd backend && npm install && npm run build
     startCommand: cd backend && npm run start:prod
     envVars:
@@ -35,6 +36,7 @@ services:
   - type: web
     name: scentiment-frontend
     env: static
+    # Static sites are always free on Render
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:

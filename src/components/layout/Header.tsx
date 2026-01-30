@@ -1,18 +1,16 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { HiShoppingBag, HiMenu, HiX, HiUser } from 'react-icons/hi';
-import { FcGoogle } from 'react-icons/fc';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/store/useCartStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SAMPLE_PRODUCT_IMAGE } from '@/lib/data';
 import { Marquee } from '@/components/ui/motion/Marquee';
 import { HeaderSearch } from '@/components/search/HeaderSearch';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import { getIconById } from '@/configs/icons/iconRegistry';
 import { loginEmailPassword, signupEmailPassword } from '@/services/auth/auth.service';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useSellerStore } from '@/store/useSellerStore';
+import { apiService } from '@/services/api/api.service';
 
 const ACCENT_CLASS: Record<'gold' | 'accent' | 'primary', string> = {
   gold: '[color:var(--ds-gold)]',
@@ -20,34 +18,10 @@ const ACCENT_CLASS: Record<'gold' | 'accent' | 'primary', string> = {
   primary: '[color:var(--ds-primary)]',
 };
 
-function CountdownTimer() {
-  const [time, setTime] = useState({ h: 11, m: 56, s: 51 });
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(prev => {
-        if (prev.s > 0) return { ...prev, s: prev.s - 1 };
-        if (prev.m > 0) return { ...prev, m: prev.m - 1, s: 59 };
-        if (prev.h > 0) return { ...prev, h: prev.h - 1, m: 59, s: 59 };
-        return { h: 11, m: 56, s: 51 }; // Reset
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="font-mono text-xl tracking-widest font-bold bg-gradient-to-r from-black via-[color:var(--ds-gold)] to-black bg-clip-text text-transparent">
-      {String(time.h).padStart(2, '0')}h:{String(time.m).padStart(2, '0')}m:{String(time.s).padStart(2, '0')}s
-    </div>
-  );
-}
-
 export function Header() {
   const { navLinks, announcements, marqueeSpeed } = useHeaderConfig();
-  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [accountMode, setAccountMode] = useState<'signin' | 'signup'>('signin');
   const [authStatus, setAuthStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -56,8 +30,9 @@ export function Header() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [hoveredNavItem, setHoveredNavItem] = useState<string | null>(null);
+  const [collections, setCollections] = useState<Array<{ id: string; handle: string; title: string }>>([]);
   const setAuthSession = useAuthStore((s) => s.setSession);
-  const setSeller = useSellerStore((s) => s.setSeller);
   const totalItems = useCartStore((state) => state.totalItems());
   const toggleCart = useCartStore((state) => state.toggleCart);
 
@@ -67,6 +42,24 @@ export function Header() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fetch collections for category dropdown
+  useEffect(() => {
+    let cancelled = false;
+    apiService
+      .getCollections()
+      .then((res) => {
+        if (!cancelled) {
+          setCollections(res.collections || []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setCollections([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -85,14 +78,6 @@ export function Header() {
       document.body.style.overflow = previousOverflow;
     };
   }, [isAccountOpen]);
-
-
-  const handleGoogleSignIn = () => {
-    const googleAuthUrl = (import.meta.env as Record<string, string | undefined>)[
-      'VITE_GOOGLE_AUTH_URL'
-    ];
-    window.location.assign(googleAuthUrl ?? '/auth/google');
-  };
 
   const canSubmit = useMemo(() => {
     const e = email.trim();
@@ -118,22 +103,7 @@ export function Header() {
             })
           : await loginEmailPassword({ email: email.trim(), password: password.trim() });
 
-      setAuthSession({ user: session.user, tokens: session.tokens });
-
-      // If admin, also set Seller store so seller pages render without placeholder state.
-      if (session.user.role === 'admin') {
-        setSeller({
-          id: session.user.id,
-          name: session.user.email.split('@')[0] || 'Admin',
-          email: session.user.email,
-          isVerified: true,
-          verificationStatus: 'approved',
-        });
-        setIsAccountOpen(false);
-        navigate('/seller/dashboard');
-        setAuthStatus('success');
-        return;
-      }
+      setAuthSession(session);
 
       setAuthStatus('success');
       setIsAccountOpen(false);
@@ -145,13 +115,10 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 flex flex-col" onMouseLeave={() => setActiveMenu(null)}>
+    <header className="fixed top-0 w-full z-50 flex flex-col">
       {/* Top Black Bar */}
       <div className="bg-white/80 backdrop-blur-md text-black py-2 relative z-[60] border-b border-gray-200/50">
         <div className="container-custom flex items-center gap-4">
-          <div className="hidden md:block shrink-0">
-            <CountdownTimer />
-          </div>
           <Marquee className="flex-1 text-[11px] tracking-[0.22em] uppercase" speed={marqueeSpeed}>
             {announcements.map((item) => (
               <span key={item.text} className="inline-flex items-center gap-2">
@@ -209,8 +176,13 @@ export function Header() {
           </button>
 
           {/* Logo */}
-          <Link to="/" className="text-3xl font-serif font-semibold tracking-tight text-black shrink-0 mr-4">
-            Scentiment
+          <Link to="/" className="shrink-0 mr-4">
+            <span className="block text-3xl font-serif font-semibold tracking-tight text-black leading-none">
+              AROMAZUR
+            </span>
+            <span className="block text-[11px] font-medium tracking-[0.28em] uppercase text-gray-500 mt-1">
+              Les Parfums de la Côte d'Azur
+            </span>
           </Link>
 
           {/* Desktop Nav - Horizontal Slider */}
@@ -224,20 +196,30 @@ export function Header() {
               >
               {navLinks.map((link) => {
                 const Icon = getIconById(link.iconId);
+                const isShopLink = link.href === '/shop' || link.name.toLowerCase() === 'shop';
+                const isHovered = hoveredNavItem === link.name;
+                const showDropdown = isShopLink && isHovered && collections.length > 0;
+                
                 return (
                 <div 
                   key={link.name} 
                   className="relative group shrink-0"
-                  onMouseEnter={() => setActiveMenu(link.name)}
+                  onMouseEnter={() => setHoveredNavItem(link.name)}
+                  onMouseLeave={() => setHoveredNavItem(null)}
                 >
                   <Link
                     to={link.href}
                     className={cn(
-                      'relative flex items-center gap-1.5 text-sm font-bold text-black hover:text-gray-600 transition-colors uppercase whitespace-nowrap',
+                      'relative flex items-center gap-1.5 text-sm font-bold uppercase whitespace-nowrap transition-all duration-200',
+                      'text-black hover:text-gray-700',
+                      isHovered && 'text-gray-700',
                       link.badges ? 'pt-8 pb-3' : 'py-4'
                     )}
                   >
-                    <Icon className="w-4 h-4" aria-hidden="true" />
+                    <Icon className={cn(
+                      'w-4 h-4 transition-transform duration-200',
+                      isHovered && 'scale-110'
+                    )} aria-hidden="true" />
                     {link.badges && (
                       <span
                         className="absolute top-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
@@ -256,409 +238,60 @@ export function Header() {
                         ))}
                       </span>
                     )}
-                    <span>{link.name}</span>
+                    <span className="relative">
+                      {link.name}
+                      {isHovered && (
+                        <motion.span
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[color:var(--ds-primary)] to-[color:var(--ds-accent)]"
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          exit={{ scaleX: 0 }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      )}
+                    </span>
                     {link.badges && (
                       <span className="sr-only">{link.badges.map((b) => b.text).join(', ')}</span>
                     )}
                   </Link>
+                  
+                  {/* Categories Dropdown */}
+                  {showDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200/50 py-2 z-50"
+                      onMouseEnter={() => setHoveredNavItem(link.name)}
+                      onMouseLeave={() => setHoveredNavItem(null)}
+                    >
+                      <Link
+                        to="/shop"
+                        className="block px-4 py-2 text-sm font-semibold text-black hover:bg-gray-50 transition-colors"
+                        onClick={() => setHoveredNavItem(null)}
+                      >
+                        All Products
+                      </Link>
+                      <div className="border-t border-gray-100 my-1" />
+                      {collections.map((collection) => (
+                        <Link
+                          key={collection.id}
+                          to={`/collections/${collection.handle}`}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors"
+                          onClick={() => setHoveredNavItem(null)}
+                        >
+                          {collection.title}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
                 </div>
               )})}
               </nav>
             </div>
           </div>
         </div>
-
-        {/* Mega Menu for Shop All */}
-        <AnimatePresence>
-          {activeMenu === 'Shop All' && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-8 z-50"
-              onMouseEnter={() => setActiveMenu('Shop All')}
-              onMouseLeave={() => setActiveMenu(null)}
-            >
-              <div className="container-custom grid grid-cols-5 gap-8">
-                {/* Diffusers */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-square flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Diffusers" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-max">
-                      <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">ALMOST SOLD OUT</span>
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">DIFFUSERS</h3>
-                </div>
-
-                {/* Diffuser Oils */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-square flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Diffuser Oils" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">DIFFUSER OILS</h3>
-                </div>
-
-                {/* Room Sprays */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-square flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Room Sprays" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-max">
-                      <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">50% OFF</span>
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">ROOM SPRAYS</h3>
-                </div>
-
-                {/* Candles */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-square flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Candles" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">CANDLES</h3>
-                </div>
-
-                {/* Perfumes */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-square flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Perfumes" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider mb-1">PERFUMES & COLOGNE</h3>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mega Menu for NEW */}
-          {activeMenu === 'NEW' && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-8 z-50"
-              onMouseEnter={() => setActiveMenu('NEW')}
-              onMouseLeave={() => setActiveMenu(null)}
-            >
-              <div className="container-custom grid grid-cols-4 gap-6">
-                {/* Hotel */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-[4/3] flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Hotel Collection" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-max">
-                      <span className="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded shadow-sm">NEW</span>
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">HOTEL</h3>
-                </div>
-
-                {/* Designer */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-[4/3] flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Designer Collection" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">DESIGNER</h3>
-                </div>
-
-                {/* Winter */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-[4/3] flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Winter Collection" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-max">
-                      <span className="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded shadow-sm">NEW 2025</span>
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">WINTER</h3>
-                </div>
-
-                {/* Scent Voyage */}
-                <div className="flex flex-col items-center group cursor-pointer">
-                  <div className="relative mb-4 w-full aspect-[4/3] flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-                    <img 
-                      src={SAMPLE_PRODUCT_IMAGE} 
-                      alt="Scent Voyage" 
-                      className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-max">
-                      <span className="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded shadow-sm">NEW</span>
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-sm uppercase tracking-wider">SCENT VOYAGE</h3>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mega Menu for DIFFUSERS */}
-          {activeMenu === 'DIFFUSERS' && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-8 z-50"
-              onMouseEnter={() => setActiveMenu('DIFFUSERS')}
-              onMouseLeave={() => setActiveMenu(null)}
-            >
-              <div className="container-custom flex gap-8">
-                {/* Sidebar Menu */}
-                <div className="w-1/5 flex flex-col gap-1 text-gray-500 text-sm">
-                  <Link to="/diffusers/all" className="ui-menu-item ui-focus-ring">Shop All Diffusers</Link>
-                  <Link to="/diffusers/starter-kit" className="ui-menu-item ui-focus-ring">Build Your Starter Kit</Link>
-                  <Link to="/diffusers/discovery-kits" className="ui-menu-item ui-focus-ring">Discovery Kits</Link>
-                  <Link to="/diffusers/car" className="ui-menu-item ui-focus-ring flex items-center gap-2">
-                    Car Diffuser 
-                    <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-extrabold leading-none text-white">Sold Out</span>
-                  </Link>
-                  <Link to="/diffusers/reed" className="ui-menu-item ui-focus-ring">Reed Diffusers</Link>
-                </div>
-
-                {/* Products Grid */}
-                <div className="flex-1 grid grid-cols-4 gap-6">
-                  {/* Diffuser Air 2 Discovery Kit */}
-                  <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
-                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">72% OFF</span>
-                      <img 
-                        src={SAMPLE_PRODUCT_IMAGE} 
-                        alt="Diffuser Air 2" 
-                        className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
-                      />
-                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser Air 2">
-                        +
-                      </button>
-                    </div>
-                    <h3 className="font-bold text-sm uppercase text-center leading-tight mb-1">DIFFUSER AIR 2 DISCOVERY KIT</h3>
-                    <p className="text-gray-500 text-xs text-center italic">Covers up to 1,000 sq ft.</p>
-                  </div>
-
-                  {/* Diffuser Mini 2 LE Discovery Kit */}
-                  <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
-                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">57% OFF</span>
-                      <img 
-                        src={SAMPLE_PRODUCT_IMAGE} 
-                        alt="Diffuser Mini 2 LE" 
-                        className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
-                      />
-                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser Mini 2">
-                        +
-                      </button>
-                    </div>
-                    <h3 className="font-bold text-sm uppercase text-center leading-tight mb-1">DIFFUSER MINI 2 LE DISCOVERY KIT</h3>
-                    <p className="text-gray-500 text-xs text-center italic">Covers 500 sqft.</p>
-                  </div>
-
-                  {/* Diffuser Pro 2 */}
-                  <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
-                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">88% OFF</span>
-                      <img 
-                        src={SAMPLE_PRODUCT_IMAGE} 
-                        alt="Diffuser Pro 2" 
-                        className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
-                      />
-                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser Pro 2">
-                        +
-                      </button>
-                    </div>
-                    <h3 className="font-bold text-sm uppercase text-center leading-tight mb-1">DIFFUSER PRO 2</h3>
-                    <p className="text-gray-500 text-xs text-center italic">Covers up to 2,000 sqft.</p>
-                  </div>
-
-                  {/* Diffuser HVAC 2 */}
-                  <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl border border-black/10 p-6 mb-4 aspect-[3/4] flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md">
-                      <span className="absolute top-3 left-3 rounded-full bg-black text-white text-[10px] font-extrabold px-2.5 py-1 leading-none">75% OFF</span>
-                      <img 
-                        src={SAMPLE_PRODUCT_IMAGE} 
-                        alt="Diffuser HVAC 2" 
-                        className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
-                      />
-                      <button className="absolute bottom-3 right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ui-focus-ring" aria-label="View Diffuser HVAC 2">
-                        +
-                      </button>
-                    </div>
-                    <h3 className="font-bold text-sm uppercase text-center leading-tight mb-1">DIFFUSER HVAC 2</h3>
-                    <p className="text-gray-500 text-xs text-center italic">Covers up to 5,000 sqft.</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mega Menu for DIFFUSER OILS */}
-          {activeMenu === 'DIFFUSER OILS' && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-8 z-50"
-              onMouseEnter={() => setActiveMenu('DIFFUSER OILS')}
-              onMouseLeave={() => setActiveMenu(null)}
-            >
-              <div className="container-custom flex gap-16">
-                {/* Left Column - Main Links */}
-                <div className="flex flex-col gap-4 min-w-[200px]">
-                  <Link to="/oils/all" className="text-gray-700 hover:text-black font-bold uppercase text-lg tracking-wide transition-colors">SHOP ALL</Link>
-                  <Link to="/oils/sale" className="text-gray-700 hover:text-black font-bold uppercase text-lg tracking-wide transition-colors flex items-center gap-2">
-                    SALE
-                    <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-sm">$4 OILS</span>
-                  </Link>
-                  <Link to="/oils/new" className="text-gray-700 hover:text-black font-bold uppercase text-lg tracking-wide transition-colors">NEW ARRIVALS</Link>
-                  <Link to="/oils/best-sellers" className="text-gray-700 hover:text-black font-bold uppercase text-lg tracking-wide transition-colors">BEST-SELLERS</Link>
-                </div>
-
-                {/* Right Column - Collections */}
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-gray-700 font-bold uppercase text-lg tracking-wide mb-2">COLLECTIONS</h3>
-                  <div className="grid grid-cols-2 gap-x-12 gap-y-3">
-                    <Link to="/collections/hotel" className="text-gray-500 hover:text-black transition-colors text-sm uppercase tracking-wider">HOTEL</Link>
-                    <Link to="/collections/designer" className="text-gray-500 hover:text-black transition-colors text-sm uppercase tracking-wider">DESIGNER</Link>
-                    <Link to="/collections/winter" className="text-gray-500 hover:text-black transition-colors text-sm uppercase tracking-wider">WINTER</Link>
-                    <Link to="/collections/scent-voyage" className="text-gray-500 hover:text-black transition-colors text-sm uppercase tracking-wider">SCENT VOYAGE</Link>
-                    <Link to="/collections/disney" className="text-gray-500 hover:text-black transition-colors text-sm uppercase tracking-wider">DISNEY</Link>
-                    <Link to="/collections/spring" className="text-gray-500 hover:text-black transition-colors text-sm uppercase tracking-wider">SPRING</Link>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mega Menu for ROOM SPRAYS */}
-          {activeMenu === 'ROOM SPRAYS' && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-6 z-50"
-              onMouseEnter={() => setActiveMenu('ROOM SPRAYS')}
-              onMouseLeave={() => setActiveMenu(null)}
-            >
-              <div className="container-custom">
-                <div className="flex flex-col gap-1 text-gray-600 text-base max-w-sm">
-                  <Link to="/collections/fragrance-room-sprays" className="ui-menu-item ui-focus-ring">Shop All Room Sprays</Link>
-                  <Link to="/sprays/hotel" className="ui-menu-item ui-focus-ring">Hotel Room Sprays</Link>
-                  <Link to="/sprays/designer" className="ui-menu-item ui-focus-ring">Designer Room Sprays</Link>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mega Menu for CANDLES */}
-          {activeMenu === 'CANDLES' && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-6 z-50"
-              onMouseEnter={() => setActiveMenu('CANDLES')}
-              onMouseLeave={() => setActiveMenu(null)}
-            >
-              <div className="container-custom">
-                <div className="flex flex-col gap-1 text-gray-600 text-base max-w-sm">
-                  <Link to="/collections/candles" className="ui-menu-item ui-focus-ring">Shop All Candles</Link>
-                  <Link to="/candles/hotel" className="ui-menu-item ui-focus-ring">Hotel Candles</Link>
-                  <Link to="/candles/designer" className="ui-menu-item ui-focus-ring">Designer Candles</Link>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mega Menu for PERFUMES */}
-          {activeMenu === 'PERFUMES' && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-8 z-50"
-              onMouseEnter={() => setActiveMenu('PERFUMES')}
-              onMouseLeave={() => setActiveMenu(null)}
-            >
-              <div className="container-custom flex gap-8">
-                {/* Sidebar Menu */}
-                <div className="w-1/5 flex flex-col gap-3 text-gray-500 text-sm">
-                  <Link to="/collections/perfumes" className="hover:text-black transition-colors">Shop All</Link>
-                  <Link to="/perfumes/mens" className="hover:text-black transition-colors">Men's Fragrances</Link>
-                  <Link to="/perfumes/womens" className="hover:text-black transition-colors">Women's Fragrances</Link>
-                  <Link to="/perfumes/unisex" className="hover:text-black transition-colors">Unisex Fragrances</Link>
-                </div>
-
-                {/* Products Grid */}
-                <div className="flex-1 grid grid-cols-2 gap-8 max-w-2xl">
-                  {/* Men's Discovery Set */}
-                  <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl p-8 mb-4 aspect-square flex items-center justify-center">
-                      <span className="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-2 py-1 rounded">73% OFF</span>
-                      <img 
-                        src={SAMPLE_PRODUCT_IMAGE} 
-                        alt="Men's Fragrance Discovery Set" 
-                        className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
-                      />
-                      <button className="absolute bottom-3 right-3 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        +
-                      </button>
-                    </div>
-                    <h3 className="font-bold text-sm uppercase text-center leading-tight mb-1">MEN'S FRAGRANCE DISCOVERY SET</h3>
-                  </div>
-
-                  {/* Women's Discovery Set */}
-                  <div className="group cursor-pointer">
-                    <div className="relative bg-gray-50 rounded-xl p-8 mb-4 aspect-square flex items-center justify-center">
-                      <span className="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-2 py-1 rounded">73% OFF</span>
-                      <img 
-                        src={SAMPLE_PRODUCT_IMAGE} 
-                        alt="Women's Fragrance Discovery Set" 
-                        className="object-contain h-full w-full group-hover:scale-105 transition-transform duration-300 mix-blend-multiply"
-                      />
-                      <button className="absolute bottom-3 right-3 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        +
-                      </button>
-                    </div>
-                    <h3 className="font-bold text-sm uppercase text-center leading-tight mb-1">WOMEN'S FRAGRANCE DISCOVERY SET</h3>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Mobile Menu Overlay */}
@@ -739,16 +372,7 @@ export function Header() {
               </div>
 
               <div className="px-6 py-6">
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  className="w-full rounded-sm border border-black/15 bg-white px-4 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-black hover:bg-black/5 transition-colors flex items-center justify-center gap-3"
-                >
-                  <FcGoogle className="h-5 w-5" aria-hidden="true" />
-                  <span>Sign in with Google</span>
-                </button>
-
-                <div className="mt-6 flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={() => {

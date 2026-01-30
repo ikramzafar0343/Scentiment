@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState>()(
         }),
       logout: () => set({ user: null, tokens: null, isAuthenticated: false }),
     }),
-    { name: 'scentiment-auth' }
+    { name: 'aromazur-auth' }
   )
 );
 

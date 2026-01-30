@@ -1,4 +1,6 @@
-# Scentiment
+# AROMAZUR
+
+**Les Parfums de la Côte d'Azur**
 
 A modern full-stack e-commerce application for luxury home fragrances and perfumes, built with React, Vite, and NestJS.
 
@@ -193,21 +195,21 @@ This project is configured for deployment on [Render](https://render.com/) with 
 
    **For Frontend Service:**
    - `VITE_API_BASE_URL` - **REQUIRED** - Set this to your backend URL + `/api/v1`
-     - Example: `https://scentiment-backend.onrender.com/api/v1`
+     - Example: `https://aromazur-backend.onrender.com/api/v1`
      - **Important:** You must set this manually in the Render dashboard after the backend is deployed
      - Get your backend URL from the backend service's "Settings" → "Info" section
    
    **For Backend Service:**
    - `FRONTEND_URL` - **REQUIRED** - Set this to your frontend URL
-     - Example: `https://scentiment-frontend.onrender.com`
+     - Example: `https://aromazur-frontend.onrender.com`
      - Used for CORS configuration
      - Set this after the frontend is deployed
 
 4. **Deploy**
    - Render will automatically build and deploy both services
-   - The backend will be available at: `https://scentiment-backend.onrender.com`
-   - The frontend will be available at: `https://scentiment-frontend.onrender.com`
-   - API Documentation: `https://scentiment-backend.onrender.com/api/v1/docs`
+   - The backend will be available at: `https://aromazur-backend.onrender.com`
+   - The frontend will be available at: `https://aromazur-frontend.onrender.com`
+   - API Documentation: `https://aromazur-backend.onrender.com/api/v1/docs`
 
 ### Render Configuration Details
 
@@ -242,7 +244,7 @@ The `render.yaml` file configures:
 ## 📂 Project Structure
 
 ```
-scentiment/
+aromazur/
 ├── src/                    # Frontend source code
 │   ├── components/         # Reusable UI components
 │   ├── pages/              # Route components

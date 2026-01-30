@@ -19,7 +19,7 @@ export function CheckoutSuccess() {
   return (
     <div className="page-surface">
       <Seo
-        title="Order confirmed — Scentiment"
+        title="Order confirmed — AROMAZUR"
         description="Your order has been placed successfully."
         canonicalPath="/checkout/success"
       />
@@ -47,7 +47,7 @@ export function CheckoutSuccess() {
               Order confirmed
             </h1>
             <p className="mt-4 text-base leading-relaxed text-gray-600 sm:text-lg">
-              Thanks for your purchase. A confirmation email will be sent shortly.
+              Thank you for choosing Aromazur. Your order of fragrances inspired by the French Riviera will be crafted with care and delivered soon. A confirmation email will be sent shortly.
             </p>
 
             <div className="mt-8 grid gap-3 text-left">

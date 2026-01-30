@@ -24,7 +24,7 @@ services:
       - key: FRONTEND_URL
         fromService:
           type: web
-          name: scentiment-frontend
+          name: aromazur-frontend
           property: host
       - key: REDIS_URL
         sync: false
@@ -32,7 +32,7 @@ services:
         sync: false
 
   - type: web
-    name: scentiment-frontend
+    name: aromazur-frontend
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
@@ -40,7 +40,7 @@ services:
       - key: VITE_API_BASE_URL
         fromService:
           type: web
-          name: scentiment-backend
+          name: aromazur-backend
           property: host
     routes:
       - type: rewrite

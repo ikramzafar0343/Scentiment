@@ -2,6 +2,14 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+/**
+ * Product model shape used by the API layer.
+ *
+ * This project treats Shopify as the source of truth for products. The Products module does not
+ * register this schema with Mongoose, so it is used primarily for typing and Swagger docs.
+ *
+ * Note: when coming from Shopify, `_id` is typically a Shopify GID (e.g. `gid://shopify/Product/123`).
+ */
 export type ProductDocument = Product & Document;
 
 class FlashSale {

@@ -25,11 +25,11 @@ export class OrdersController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all orders' })
+  @ApiOperation({ summary: 'Get all orders for the authenticated user' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'status', required: false, enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] })
-  @ApiResponse({ status: 200, description: 'Return all orders.' })
+  @ApiResponse({ status: 200, description: 'Return all orders for the user.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async findAll(
     @Request() req: any,
@@ -37,60 +37,24 @@ export class OrdersController {
     @Query('limit') limit?: number,
     @Query('status') status?: string,
   ): Promise<Order[]> {
-    // Admin can see all orders, regular users only see their own
-    const userId = req.user.role === 'admin' ? undefined : req.user.id;
-    return this.ordersService.findAll(page, limit, userId, status);
+    // Customers can only see their own orders
+    // Order management is handled via Shopify Admin Store
+    return this.ordersService.findAll(page, limit, req.user.id, status);
   }
 
-  @Get('stats')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get order statistics' })
-  @ApiQuery({ name: 'startDate', required: false, type: String })
-  @ApiQuery({ name: 'endDate', required: false, type: String })
-  @ApiResponse({ status: 200, description: 'Return order statistics.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async getStats(
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-  ) {
-    const start = startDate ? new Date(startDate) : undefined;
-    const end = endDate ? new Date(endDate) : undefined;
-    return this.ordersService.getOrderStatistics(start, end);
-  }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get order by id' })
-  @ApiParam({ name: 'id', description: 'MongoDB ObjectId of the order' })
+  @ApiParam({ name: 'id', description: 'Shopify order GID (e.g., gid://shopify/Order/123)' })
   @ApiResponse({ status: 200, description: 'Return the order.' })
   @ApiResponse({ status: 404, description: 'Order not found.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async findOne(@Request() req: any, @Param('id') id: string): Promise<Order> {
-    // Admin can see any order, regular users only see their own
-    const userId = req.user.role === 'admin' ? undefined : req.user.id;
-    return this.ordersService.findOne(id, userId);
+    // Customers can only see their own orders
+    // Order management is handled via Shopify Admin Store
+    return this.ordersService.findOne(id, req.user.id);
   }
 
-  @Put(':id/status')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update order status' })
-  @ApiParam({ name: 'id', description: 'MongoDB ObjectId of the order' })
-  @ApiBody({ schema: { type: 'object', properties: { status: { type: 'string', enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] } } } })
-  @ApiResponse({ status: 200, description: 'Order status updated.' })
-  @ApiResponse({ status: 404, description: 'Order not found.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async updateStatus(
-    @Request() req: any,
-    @Param('id') id: string,
-    @Body('status') status: string,
-  ): Promise<Order> {
-    // Only admin can update order status
-    if (req.user.role !== 'admin') {
-      throw new Error('Only admins can update order status');
-    }
-    return this.ordersService.updateStatus(id, status);
-  }
 }

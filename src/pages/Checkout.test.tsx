@@ -59,7 +59,7 @@ async function renderCheckout(initialPath = '/checkout') {
 
 describe('Checkout page', () => {
   beforeEach(() => {
-    localStorage.removeItem('scentiment-cart');
+    localStorage.removeItem('aromazur-cart');
     useCartStore.setState({ items: [], isOpen: false });
   });
 

@@ -20,7 +20,7 @@ describe('Home page', () => {
   it('renders key conversion sections', () => {
     renderHome();
     expect(screen.getByRole('heading', { name: /your journey to premium home fragrance/i })).toBeTruthy();
-    expect(screen.getByRole('heading', { name: /what makes scentiment different/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /what makes aromazur different/i })).toBeTruthy();
     expect(screen.getByRole('heading', { name: /what our customers say/i })).toBeTruthy();
     expect(screen.getByRole('heading', { name: /everything you need to know/i })).toBeTruthy();
   });

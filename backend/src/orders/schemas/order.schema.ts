@@ -2,6 +2,14 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+/**
+ * Order model shape used by the API layer.
+ *
+ * This project treats Shopify as the source of truth for orders. The Orders module does not
+ * register this schema with Mongoose, so it is used primarily for typing and Swagger docs.
+ *
+ * Note: IDs in order APIs are typically Shopify GIDs (e.g. `gid://shopify/Order/123`), not ObjectIds.
+ */
 export type OrderDocument = Order & Document;
 
 class OrderItem {

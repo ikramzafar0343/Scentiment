@@ -167,7 +167,7 @@ export function Hero() {
                     </video>
                     <img
                       src={sampleImage}
-                      alt="Scentiment premium home fragrance diffuser and oils"
+                      alt="AROMAZUR premium home fragrance diffuser and oils"
                       className={cn(
                         'relative h-full w-full object-cover transition-opacity duration-500',
                         !reduceMotion && visualInView ? 'opacity-0' : 'opacity-100'

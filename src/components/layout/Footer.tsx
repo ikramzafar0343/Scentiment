@@ -20,9 +20,10 @@ export function Footer() {
       <div className="relative container-custom py-16 sm:py-20">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="text-lg font-semibold tracking-tight text-white">Scentiment</div>
+            <div className="text-lg font-semibold tracking-tight text-white">AROMAZUR</div>
+            <p className="mt-2 text-xs italic text-white/60">Les Parfums de la Côte d'Azur</p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/75">
-              Premium fragrances and devices curated for modern spaces. Clean ingredients, fast shipping, and support that feels human.
+              Aromazur embodies the refined elegance of the French Riviera, where timeless sophistication meets modern artistry. Inspired by the perfumery heritage of Grasse, each creation reflects a delicate balance of nature, emotion, and savoir‑faire.
             </p>
             <div className="mt-5 flex items-center gap-3">
               <a
@@ -86,14 +87,14 @@ export function Footer() {
                 Subscribe
               </button>
               <p className="text-[11px] leading-relaxed text-white/55">
-                By subscribing, you agree to receive emails from Scentiment.
+                By subscribing, you agree to receive emails from AROMAZUR.
               </p>
             </form>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 text-sm text-white/65 md:flex-row md:items-center">
-          <p>&copy; {new Date().getFullYear()} Scentiment. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} AROMAZUR. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-white/35" aria-label="Support and payments">
               <HiShieldCheck className="h-5 w-5" />

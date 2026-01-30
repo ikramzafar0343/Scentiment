@@ -10,7 +10,6 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
 import { OrdersModule } from './orders/orders.module';
-import { AnalyticsModule } from './analytics/analytics.module';
 import { PaymentsModule } from './payments/payments.module';
 
 @Module({
@@ -49,7 +48,6 @@ import { PaymentsModule } from './payments/payments.module';
     AuthModule,
     HealthModule,
     OrdersModule,
-    AnalyticsModule,
     PaymentsModule,
   ],
   controllers: [AppController],

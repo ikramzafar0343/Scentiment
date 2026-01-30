@@ -8,7 +8,7 @@ export type AuthUser = {
   role: string;
 };
 
-const STORAGE_KEY = 'scentiment-auth';
+const STORAGE_KEY = 'aromazur-auth';
 
 function getApiBaseUrl(): string {
   const env = import.meta.env as Record<string, string | undefined>;

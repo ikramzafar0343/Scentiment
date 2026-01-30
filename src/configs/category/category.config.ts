@@ -9,14 +9,14 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   shop: {
     metadata: {
       seo: {
-        title: 'Shop — Scentiment',
+        title: 'Shop — AROMAZUR',
         description: 'Shop premium fragrances, diffusers, oils, room sprays, candles, and perfumes. Filter by category and price, then add to cart instantly.',
         canonicalPath: '/shop'
       },
       header: {
         eyebrow: 'Shop',
         title: 'The Collection',
-        description: 'Discover our curated selection of premium fragrances, diffusers, and candles designed to elevate your space.'
+        description: 'Discover fragrances inspired by the perfumery heritage of Grasse. Each creation embodies the refined elegance of the French Riviera, where timeless sophistication meets modern artistry.'
       },
       backgroundImagePrompt: 'premium luxury fragrance collection elegant modern interior curated products professional photography soft lighting'
     },
@@ -42,13 +42,13 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   new: {
     metadata: {
       seo: {
-        title: 'New Arrivals — Scentiment',
-        description: 'Discover the latest additions to our luxury fragrance collection. Crafted to transform your space.'
+        title: 'New Arrivals — AROMAZUR',
+        description: 'Discover the latest fragrances inspired by Grasse. Each new arrival embodies the refined elegance of the French Riviera, crafted with care and guided by French luxury traditions.'
       },
       header: {
         eyebrow: 'Latest Drops',
         title: 'New Arrivals',
-        description: 'Discover the latest additions to our luxury fragrance collection. Crafted to transform your space.'
+        description: 'Discover the latest fragrances inspired by Grasse. Each new arrival embodies the refined elegance of the French Riviera, crafted with care and guided by French luxury traditions.'
       },
       backgroundImagePrompt: 'new luxury fragrances latest arrivals premium products elegant modern interior professional photography'
     },
@@ -68,7 +68,7 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
     featuredContent: {
       title: 'The Hotel Collection',
       subtitle: 'Featured launch',
-      description: 'Bring the essence of 5-star luxury into your home. Our newest collection features scents inspired by the world\'s most iconic hotels.',
+      description: 'Experience the refined elegance of the French Riviera. Our newest collection features fragrances inspired by Grasse, where timeless sophistication meets modern artistry.',
       ctaLabel: 'Shop the collection',
       imagePrompt: 'photorealistic premium home fragrance collection, elegant diffuser bottle and fragrance oils, modern interior background, luxury editorial product photo, high detail, 85mm'
     }
@@ -76,7 +76,7 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   sale: {
     metadata: {
       seo: {
-        title: 'Sale — Scentiment',
+        title: 'Sale — AROMAZUR',
         description: 'Exclusive deals on our premium diffusers and fragrances. Limited time only.'
       },
       header: {
@@ -103,7 +103,7 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   diffusers: {
     metadata: {
       seo: {
-        title: 'Diffusers — Scentiment',
+        title: 'Diffusers — AROMAZUR',
         description: 'Elevate your environment with our state-of-the-art cold-air diffusion technology.'
       },
       header: {
@@ -130,13 +130,13 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   oils: {
     metadata: {
       seo: {
-        title: 'Fragrance Oils — Scentiment',
-        description: '100% Pure Fragrance Oils for Scent Diffusers. Safe for Pets & Kids.'
+        title: 'Fragrance Oils — AROMAZUR',
+        description: 'Fragrance oils inspired by the perfumery heritage of Grasse. Each creation reflects a delicate balance of nature, emotion, and savoir‑faire. Safe for Pets & Kids.'
       },
       header: {
         eyebrow: 'Best Sellers',
         title: 'Fragrance Oils',
-        description: '100% Pure Fragrance Oils for Scent Diffusers. Safe for Pets & Kids.'
+        description: 'Fragrance oils inspired by the perfumery heritage of Grasse. Each creation reflects a delicate balance of nature, emotion, and savoir‑faire. Safe for Pets & Kids.'
       },
       backgroundImagePrompt: 'premium fragrance oils luxury bottles elegant arrangement professional photography soft golden light'
     },
@@ -157,13 +157,13 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   sprays: {
     metadata: {
       seo: {
-        title: 'Room Sprays — Scentiment',
-        description: 'Transform your space instantly with our luxury room sprays. Inspired by world-class hotels.'
+        title: 'Room Sprays — AROMAZUR',
+        description: 'Transform your space instantly with fragrances inspired by the French Riviera. Each spray embodies the refined elegance of Grasse perfumery.'
       },
       header: {
         eyebrow: 'Instant Freshness',
         title: 'Room Sprays',
-        description: 'Transform your space instantly with our luxury room sprays. Inspired by world-class hotels.'
+        description: 'Transform your space instantly with fragrances inspired by the French Riviera. Each spray embodies the refined elegance of Grasse perfumery.'
       },
       backgroundImagePrompt: 'luxury room sprays premium bottles elegant modern interior professional photography'
     },
@@ -184,14 +184,14 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   candles: {
     metadata: {
       seo: {
-        title: 'Candles — Scentiment',
+        title: 'Candles — AROMAZUR',
         description: 'Hand-poured luxury candles crafted to transform your space with warmth, elegance, and unforgettable fragrance.',
         canonicalPath: '/candles'
       },
       header: {
         eyebrow: 'Hand-poured luxury',
         title: 'The Candle Collection',
-        description: 'Illuminate your senses. Our soy-blend candles are crafted to transform your space with warmth, elegance, and unforgettable fragrance.'
+        description: 'Illuminate your senses with candles inspired by the perfumery heritage of Grasse. Crafted with care, each creation reflects the delicate balance of nature, emotion, and savoir‑faire.'
       },
       backgroundImagePrompt: 'luxury scented candles elegant arrangement warm ambient lighting modern interior cozy atmosphere professional photography'
     },
@@ -250,14 +250,14 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   perfumes: {
     metadata: {
       seo: {
-        title: 'Perfumes — Scentiment',
+        title: 'Perfumes — AROMAZUR',
         description: 'Luxury perfumes inspired by iconic designer fragrances. Shop by scent profile and find your signature scent.',
         canonicalPath: '/perfumes'
       },
       header: {
         eyebrow: 'Designer inspired',
         title: 'Fine Fragrance',
-        description: 'Discover your signature scent. Luxury perfumes inspired by the world\'s most iconic designer fragrances, without the markup.'
+        description: 'Discover your signature scent. Luxury perfumes inspired by Grasse, where timeless sophistication meets modern artistry. Subtle yet unforgettable, radiant yet deeply personal.'
       },
       backgroundImagePrompt: 'luxury designer perfumes elegant bottles premium arrangement modern interior soft golden lighting professional photography'
     },
@@ -316,14 +316,14 @@ export const CATEGORY_PAGES_CONFIG: CategoryPagesConfig = {
   voyage: {
     metadata: {
       seo: {
-        title: 'Scent Voyage — Scentiment',
+        title: 'Scent Voyage — AROMAZUR',
         description: 'Travel the world through scent. Explore destination-inspired discovery sets and premium fragrance oils.',
         canonicalPath: '/collection/voyage'
       },
       header: {
         eyebrow: 'The world collection',
         title: 'Scent Voyage',
-        description: 'Embark on a sensory journey to iconic destinations—capturing the essence of luxury travel in every drop.'
+        description: 'Embark on a sensory journey inspired by the French Riviera. Each destination reflects the refined elegance of Grasse perfumery, crafted with care and guided by French luxury traditions.'
       },
       backgroundImagePrompt: 'luxury travel destinations premium fragrance collection elegant modern interior professional photography'
     },

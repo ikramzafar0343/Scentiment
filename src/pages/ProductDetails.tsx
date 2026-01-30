@@ -50,8 +50,8 @@ function ProductDetailsView({ product }: { product: CatalogProduct }) {
   return (
     <div className="page-surface">
       <Seo
-        title={`${product.name} — Scentiment`}
-        description={product.description ?? `Shop ${product.name} on Scentiment.`}
+        title={`${product.name} — AROMAZUR`}
+        description={product.description ?? `Shop ${product.name} on AROMAZUR.`}
         canonicalPath={`/products/${slugify(product.name)}`}
       />
 

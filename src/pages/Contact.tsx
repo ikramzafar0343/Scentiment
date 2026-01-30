@@ -45,15 +45,15 @@ export function Contact() {
   return (
     <div className="page-surface">
       <Seo
-        title="Contact — Scentiment"
-        description="Need help choosing a scent or checking an order? Contact Scentiment and our team will respond quickly."
+        title="Contact — AROMAZUR"
+        description="Discover the refined elegance of the French Riviera. Contact AROMAZUR for guidance on selecting fragrances inspired by Grasse's perfumery heritage."
         canonicalPath="/contact"
       />
 
       <PageHeader
         eyebrow="Support"
         title="Contact"
-        description="Need help choosing a scent or checking an order? Send a message and we’ll get back to you quickly."
+        description="Need guidance selecting a fragrance that reflects the delicate balance of nature, emotion, and savoir‑faire? Our team is here to help you discover the essence of the French Riviera."
       />
       
       <PageContainer className="py-12 sm:py-16">

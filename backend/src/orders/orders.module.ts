@@ -1,14 +1,19 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { Module } from '@nestjs/common';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
-import { Order, OrderSchema } from './schemas/order.schema';
 import { RedisModule } from '../redis/redis.module';
+import { ShopifyModule } from '../shopify/shopify.module';
 
+/**
+ * Orders Module
+ * 
+ * Uses Shopify Admin API as the source of truth for all order operations.
+ * Order schema is kept for type definitions and optional logging purposes only.
+ */
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
     RedisModule,
+    ShopifyModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

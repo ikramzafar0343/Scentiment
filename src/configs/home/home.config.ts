@@ -7,64 +7,64 @@ import type { HomeConfig } from './home.schema';
 
 export const HOME_CONFIG: HomeConfig = {
   hero: {
-    eyebrow: 'Scentiment',
-    headline: 'Transform your space with premium home fragrance.',
+    eyebrow: 'AROMAZUR',
+    headline: 'Les Parfums de la Côte d\'Azur',
     subtext:
-      'Discover luxury diffusers and hotel-inspired fragrance oils designed for modern living. Experience clean ingredients, fast shipping, and personalized support that makes fragrance effortless.',
-    primaryCta: 'Shop Collection',
-    secondaryCta: 'See how it works',
-    backgroundImagePrompt: 'premium luxury home fragrance diffuser oils elegant modern interior soft lighting professional photography'
+      'Aromazur embodies the refined elegance of the French Riviera, where timeless sophistication meets modern artistry. Inspired by the perfumery heritage of Grasse, each creation reflects a delicate balance of nature, emotion, and savoir‑faire.',
+    primaryCta: 'Discover Our Collection',
+    secondaryCta: 'Our Heritage',
+    backgroundImagePrompt: 'French Riviera Côte d\'Azur Grasse perfumery elegant luxury fragrance bottles Mediterranean coast sophisticated modern artistry'
   },
   features: {
     section: {
-      eyebrow: 'Why Choose Us',
-      title: 'What makes Scentiment different',
-      description: 'Our commitment to quality, service, and your satisfaction'
+      eyebrow: 'Our Heritage',
+      title: 'What makes AROMAZUR different',
+      description: 'Crafted with care and guided by French luxury traditions, Aromazur perfumes are designed to leave a lasting impression — subtle yet unforgettable, radiant yet deeply personal.'
     },
     items: [
       {
-        title: 'Premium, curated catalog',
-        description: 'Hand-picked categories and edits that feel intentional and premium.',
+        title: 'Grasse Heritage',
+        description: 'Inspired by the perfumery capital of the world, where centuries of artistry meet modern innovation.',
         iconId: 'GiTrophy',
         gradient: 'from-[#d4af37]/20 via-[#f4e4bc]/30 to-[#fff9e6]/40',
         iconBg: 'bg-[#d4af37]/10',
         iconColor: 'text-[#d4af37]'
       },
       {
-        title: 'Clean ingredients',
-        description: 'Formulated for a safer, better everyday experience.',
+        title: 'Nature & Emotion',
+        description: 'Each fragrance reflects a delicate balance of natural essences, emotional resonance, and savoir‑faire.',
         iconId: 'HiSparkles',
         gradient: 'from-emerald-200/30 via-green-100/30 to-emerald-50/40',
         iconBg: 'bg-emerald-200/20',
         iconColor: 'text-emerald-600'
       },
       {
-        title: 'Fast shipping',
-        description: 'Quick fulfillment with reliable tracking and careful packaging.',
+        title: 'French Luxury',
+        description: 'Guided by timeless French luxury traditions, crafted with meticulous attention to detail.',
         iconId: 'HiTruck',
         gradient: 'from-red-200/30 via-rose-100/30 to-red-50/40',
         iconBg: 'bg-red-200/20',
         iconColor: 'text-red-600'
       },
       {
-        title: 'Trusted quality',
-        description: 'Products designed to perform consistently and look great in your space.',
+        title: 'Lasting Impression',
+        description: 'Subtle yet unforgettable, radiant yet deeply personal — designed to transform your space.',
         iconId: 'HiStar',
         gradient: 'from-[#0066cc]/20 via-[#e6f2ff]/30 to-[#f0f7ff]/40',
         iconBg: 'bg-[#0066cc]/10',
         iconColor: 'text-[#0066cc]'
       },
       {
-        title: 'Secure checkout',
-        description: 'Confidence from browse to buy with clear policies and secure payments.',
+        title: 'Timeless Sophistication',
+        description: 'Where refined elegance meets modern artistry, creating scents that transcend trends.',
         iconId: 'HiShieldCheck',
         gradient: 'from-purple-200/30 via-purple-100/30 to-purple-50/40',
         iconBg: 'bg-purple-200/20',
         iconColor: 'text-purple-600'
       },
       {
-        title: 'Real support',
-        description: 'Responsive help that feels human, not ticket-driven.',
+        title: 'Crafted with Care',
+        description: 'Every creation is thoughtfully composed to evoke the essence of the French Riviera.',
         iconId: 'HiHeart',
         gradient: 'from-pink-200/30 via-pink-100/30 to-pink-50/40',
         iconBg: 'bg-pink-200/20',
@@ -73,66 +73,66 @@ export const HOME_CONFIG: HomeConfig = {
     ],
     banners: [
       {
-        title: 'Hotel Lobby Vibes',
-        description: 'Oud • Amber • Leather',
-        imagePrompt: 'photorealistic luxury hotel lobby interior, warm ambient lighting, polished stone, subtle leather accents, premium editorial style, shallow depth of field, 35mm, high detail'
+        title: 'Côte d\'Azur Elegance',
+        description: 'Lavender • Mimosa • Mediterranean',
+        imagePrompt: 'French Riviera Côte d\'Azur Mediterranean coast elegant luxury Grasse perfumery sophisticated French luxury heritage timeless sophistication'
       },
       {
-        title: 'Fresh & Airy Rooms',
-        description: 'White Tea • Citrus • Cedar',
-        imagePrompt: 'photorealistic bright modern hotel room, soft morning light, clean minimal decor, airy curtains, premium lifestyle editorial, high detail, 35mm'
+        title: 'Grasse Heritage',
+        description: 'Rose • Jasmine • Bergamot',
+        imagePrompt: 'Grasse France perfumery heritage traditional French perfumery artisanal craftsmanship elegant luxury fragrance creation savoir-faire'
       },
       {
-        title: 'Candlelit Evenings',
-        description: 'Vanilla • Sandalwood • Smoke',
-        imagePrompt: 'photorealistic candlelit evening scene, warm glow, soft shadows, elegant table styling, cozy premium atmosphere, high detail, cinematic, 35mm'
+        title: 'Timeless Sophistication',
+        description: 'Neroli • Amber • Vanilla',
+        imagePrompt: 'French luxury elegance refined sophistication timeless artistry modern luxury French Riviera refined elegance sophisticated fragrance'
       },
       {
-        title: 'Designer-Grade Diffusion',
-        description: 'Consistent performance • Reliable coverage',
-        imagePrompt: 'photorealistic premium home scent diffuser on modern shelf, soft studio lighting, minimal design, luxury editorial product photo, high detail, 85mm'
+        title: 'Nature & Emotion',
+        description: 'Delicate balance • Savoir-faire',
+        imagePrompt: 'natural essences emotional resonance delicate balance French perfumery artistry sophisticated composition elegant fragrance creation'
       },
       {
-        title: 'Signature Scent Collections',
-        description: 'Mix • Layer • Customize',
-        imagePrompt: 'photorealistic luxury fragrance bottles and scent oils arranged neatly, modern neutral background, premium editorial product styling, high detail, 85mm'
+        title: 'Radiant & Personal',
+        description: 'Subtle yet unforgettable',
+        imagePrompt: 'luxury French fragrance bottles elegant arrangement sophisticated personal scent collection radiant deeply personal lasting impression'
       }
     ]
   },
   howItWorks: {
     section: {
-      eyebrow: 'How It Works',
-      title: 'Your journey to premium home fragrance',
-      description: 'A simple, guided experience that helps you discover and enjoy luxury scents in your space.'
+      eyebrow: 'Our Craft',
+      title: 'The art of French perfumery',
+      description: 'Discover how Aromazur brings the refined elegance of the French Riviera into your space through time-honored traditions and modern artistry.'
     },
     steps: [
       {
-        title: 'Discover your style',
-        description: 'Browse curated collections inspired by luxury hotels and designer fragrances. Find scents that match your space and mood.',
+        title: 'Grasse Inspiration',
+        description: 'Each fragrance draws from the perfumery heritage of Grasse, where nature, emotion, and savoir‑faire converge in perfect harmony.',
         iconId: 'HiSparkles',
         gradient: 'from-[#d4af37]/20 via-[#f4e4bc]/30 to-[#fff9e6]/40',
         iconBg: 'bg-[#d4af37]/10',
         iconColor: 'text-[#d4af37]'
       },
       {
-        title: 'Select your products',
-        description: 'Choose from premium diffusers, fragrance oils, room sprays, and candles. All crafted with clean ingredients for lasting performance.',
+        title: 'Artisanal Creation',
+        description: 'Crafted with care and guided by French luxury traditions, our perfumes reflect a delicate balance of natural essences and emotional resonance.',
         iconId: 'HiBeaker',
         gradient: 'from-[#20b2aa]/20 via-[#d4f4f1]/30 to-[#e6f7f5]/40',
         iconBg: 'bg-[#20b2aa]/10',
         iconColor: 'text-[#20b2aa]'
       },
       {
-        title: 'Set up in minutes',
-        description: 'Follow our simple setup guide. Most diffusers are ready to use right out of the box with clear, step-by-step instructions.',
+        title: 'Timeless Sophistication',
+        description: 'Where refined elegance meets modern artistry, creating scents that are subtle yet unforgettable, radiant yet deeply personal.',
         iconId: 'HiCog',
         gradient: 'from-[#0066cc]/20 via-[#e6f2ff]/30 to-[#f0f7ff]/40',
         iconBg: 'bg-[#0066cc]/10',
         iconColor: 'text-[#0066cc]'
       },
       {
-        title: 'Enjoy premium fragrance',
-        description: 'Experience fast shipping, beautiful packaging, and ongoing support. Your space transforms into a luxury environment every day.',
+        title: 'Lasting Impression',
+        description: 'Experience the essence of the French Riviera in your space. Each creation is designed to leave a lasting impression that transforms your environment.',
         iconId: 'HiGift',
         gradient: 'from-rose-200/30 via-pink-100/30 to-rose-50/40',
         iconBg: 'bg-rose-200/20',
@@ -142,14 +142,14 @@ export const HOME_CONFIG: HomeConfig = {
   },
   useCases: {
     section: {
-      eyebrow: 'Use Cases',
-      title: 'Perfect for every space',
-      description: 'From residential homes to commercial spaces, our premium fragrances enhance any environment with luxury scents.'
+      eyebrow: 'Every Space',
+      title: 'Perfect for every environment',
+      description: 'From intimate residences to grand hospitality spaces, Aromazur fragrances bring the refined elegance of the French Riviera to any setting.'
     },
     items: [
       {
         title: 'Residential',
-        description: 'Transform your home into a luxury retreat. Create signature scents for every room that welcome you and your guests daily.',
+        description: 'Transform your home with the timeless sophistication of the Côte d\'Azur. Create signature scents that reflect your personal style and elevate daily moments.',
         iconId: 'HiHome',
         gradient: 'from-amber-200/30 via-amber-100/30 to-amber-50/40',
         iconBg: 'bg-amber-200/20',
@@ -157,7 +157,7 @@ export const HOME_CONFIG: HomeConfig = {
       },
       {
         title: 'Retail & Boutiques',
-        description: 'Enhance the shopping experience with memorable fragrance. Create an atmosphere that turns visitors into loyal customers.',
+        description: 'Enhance the shopping experience with fragrances inspired by Grasse. Create an atmosphere of refined elegance that captivates and inspires.',
         iconId: 'HiSparkles',
         gradient: 'from-purple-200/30 via-purple-100/30 to-purple-50/40',
         iconBg: 'bg-purple-200/20',
@@ -165,7 +165,7 @@ export const HOME_CONFIG: HomeConfig = {
       },
       {
         title: 'Workplaces',
-        description: 'Improve focus and well-being in office spaces. Subtle, professional fragrances that enhance productivity and comfort.',
+        description: 'Infuse professional spaces with subtle, sophisticated scents. Enhance focus and well-being through the delicate balance of nature and emotion.',
         iconId: 'HiOfficeBuilding',
         gradient: 'from-blue-200/30 via-blue-100/30 to-blue-50/40',
         iconBg: 'bg-blue-200/20',
@@ -173,7 +173,7 @@ export const HOME_CONFIG: HomeConfig = {
       },
       {
         title: 'Hospitality',
-        description: 'Deliver consistent, premium experiences for hotels, spas, and venues. Professional-grade solutions for guest satisfaction.',
+        description: 'Deliver the essence of French luxury to hotels, spas, and venues. Professional-grade fragrances that leave a lasting, unforgettable impression.',
         iconId: 'HiUsers',
         gradient: 'from-teal-200/30 via-teal-100/30 to-teal-50/40',
         iconBg: 'bg-teal-200/20',
@@ -185,32 +185,32 @@ export const HOME_CONFIG: HomeConfig = {
     section: {
       eyebrow: 'Frequently Asked Questions',
       title: 'Everything you need to know',
-      description: 'Get answers to common questions about our products, shipping, returns, and more.'
+      description: 'Discover answers about Aromazur fragrances, inspired by the perfumery heritage of Grasse and crafted with French luxury traditions.'
     },
     items: [
       {
-        q: 'How long do fragrance oils last?',
-        a: 'A 50ml bottle typically lasts 2-3 months with normal use (4-6 hours per day). Our Mini Diffuser consumes approximately 1ml per hour at medium intensity. Coverage and longevity vary by product—check individual product pages for specific details.'
+        q: 'What makes Aromazur fragrances unique?',
+        a: 'Aromazur embodies the refined elegance of the French Riviera, where timeless sophistication meets modern artistry. Each creation is inspired by the perfumery heritage of Grasse and reflects a delicate balance of nature, emotion, and savoir‑faire. Crafted with care and guided by French luxury traditions, our perfumes are designed to leave a lasting impression — subtle yet unforgettable, radiant yet deeply personal.'
       },
       {
-        q: 'Are your fragrance oils safe and clean?',
-        a: 'Yes. All our products are formulated with clean ingredients and comply with IFRA (International Fragrance Association) safety standards. We use cruelty-free formulas that are safe for children and pets. Full ingredient lists are available on product pages.'
+        q: 'Are your fragrances inspired by Grasse?',
+        a: 'Yes. Aromazur draws inspiration from Grasse, the perfumery capital of the world. Each fragrance reflects centuries of French perfumery artistry, combining natural essences with modern innovation. Our creations honor the delicate balance of nature, emotion, and savoir‑faire that defines the Grasse tradition.'
       },
       {
-        q: 'How fast is shipping?',
-        a: 'We ship most orders within 24 hours (business days). Delivery typically takes 2-4 days within the continental US. You will receive tracking information as soon as your order ships. Free shipping is available on orders over $100.'
+        q: 'How do I choose the right fragrance?',
+        a: 'Browse our collections inspired by the French Riviera and Grasse heritage. Each product reflects the refined elegance of the Côte d\'Azur. For personalized guidance in selecting a fragrance that embodies timeless sophistication, contact our team — we are here to help you discover the perfect scent.'
+      },
+      {
+        q: 'What is your shipping policy?',
+        a: 'We ship most orders within 24 hours (business days). Delivery typically takes 2-4 days within the continental US. You will receive tracking information as soon as your order ships. Free shipping is available on orders over €100.'
       },
       {
         q: 'What is your return policy?',
         a: 'We offer a 30-day satisfaction guarantee. If you are not completely happy with your purchase, contact our support team and we will process a return or exchange. Returns are free and simple—we will guide you through every step.'
       },
       {
-        q: 'How do I choose the right scent for my space?',
-        a: 'Browse our collections by mood or inspiration (Hotel Collection, Designer Collection). Each product page includes detailed scent notes and coverage information. For personalized recommendations, contact our support team—we are happy to help you find the perfect fragrance.'
-      },
-      {
-        q: 'What does "inspired by" mean?',
-        a: 'Our Designer Collection features original fragrance creations inspired by the signature scents of luxury brands. These are not duplicates but unique interpretations crafted by expert perfumers to capture the essence of beloved designer fragrances at accessible prices.'
+        q: 'Are your fragrances safe and clean?',
+        a: 'Yes. All our products are crafted with care and comply with IFRA (International Fragrance Association) safety standards. We use cruelty-free formulas that are safe for children and pets. Full ingredient lists are available on product pages.'
       }
     ]
   },
@@ -255,25 +255,25 @@ export const HOME_CONFIG: HomeConfig = {
     section: {
       eyebrow: 'Customer Reviews',
       title: 'What our customers say',
-      description: 'Join thousands of satisfied customers who trust Scentiment'
+      description: 'Join those who have discovered the refined elegance of Aromazur — subtle yet unforgettable, radiant yet deeply personal.'
     },
     testimonials: [
       {
         quote:
-          'The scents are clean, premium, and the experience feels truly elevated. Setup was effortless and the packaging is beautiful.',
-        name: 'Ayesha',
+          'The sophistication of the French Riviera captured in every scent. Each fragrance tells a story of timeless elegance and modern artistry.',
+        name: 'Sophie',
         meta: 'Verified customer'
       },
       {
         quote:
-          'We use it in our studio space—guests constantly ask what the fragrance is. It\'s become part of our brand experience.',
-        name: 'Daniel',
-        meta: 'Small business owner'
+          'Inspired by Grasse, crafted with care. These fragrances transform our space with the delicate balance of nature, emotion, and savoir‑faire.',
+        name: 'Jean-Pierre',
+        meta: 'Luxury boutique owner'
       },
       {
         quote:
-          'Fast shipping, great support, and the fragrance lasts. Everything feels well-designed and premium.',
-        name: 'Mina',
+          'Subtle yet unforgettable — exactly as promised. Aromazur brings the essence of the Côte d\'Azur into our home, leaving a lasting impression every day.',
+        name: 'Isabelle',
         meta: 'Verified customer'
       }
     ],
@@ -347,8 +347,8 @@ export const HOME_CONFIG: HomeConfig = {
   ],
   cta: {
     eyebrow: 'Newsletter',
-    title: 'Get 10% off your first order',
-    description: 'Subscribe to receive exclusive offers, new arrivals, and fragrance tips delivered to your inbox.',
+    title: 'Discover the essence of the French Riviera',
+    description: 'Subscribe to receive exclusive offers, new arrivals inspired by Grasse, and insights into the art of French perfumery.',
     emailPlaceholder: 'Enter your email address',
     subscribeButtonText: 'Subscribe',
     subscribedButtonText: 'Subscribed',

@@ -172,7 +172,7 @@ export function Checkout() {
 
   return (
     <div className="page-surface">
-      <Seo title="Checkout — Scentiment" description="Complete your purchase securely." canonicalPath="/checkout" />
+      <Seo title="Checkout — AROMAZUR" description="Complete your purchase securely." canonicalPath="/checkout" />
 
       <CheckoutBreadcrumbs />
 

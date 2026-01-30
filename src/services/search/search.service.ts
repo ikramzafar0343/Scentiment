@@ -48,7 +48,7 @@ export class SearchService {
    */
   static loadRecentlyViewed(products: SearchProduct[]): SearchProduct[] {
     try {
-      const raw = window.localStorage.getItem('scentiment-recently-viewed');
+      const raw = window.localStorage.getItem('aromazur-recently-viewed');
       const ids = raw ? (JSON.parse(raw) as string[]) : [];
       const map = new Map(products.map((p) => [p.id, p] as const));
       const limit = SEARCH_CONFIG.limits.maxRecentlyViewed;

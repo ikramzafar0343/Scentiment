@@ -155,96 +155,6 @@ class ApiService {
     });
   }
 
-  async createProduct(productData: any, token: string) {
-    return this.request<any>('/products', {
-      method: 'POST',
-      body: JSON.stringify(productData),
-      token,
-    });
-  }
-
-  async updateProduct(id: string, productData: any, token: string) {
-    return this.request<any>(`/products/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(productData),
-      token,
-    });
-  }
-
-  async deleteProduct(id: string, token: string) {
-    return this.request(`/products/${id}`, {
-      method: 'DELETE',
-      token,
-    });
-  }
-
-  // Dashboard/Analytics endpoints
-  async getDashboardStats(token?: string) {
-    return this.request<{
-      totalSales: number;
-      totalSalesChange: string;
-      activeListings: number;
-      activeListingsChange: string;
-      monthlyRevenue: number;
-      monthlyRevenueChange: string;
-      totalProducts: number;
-      totalProductsChange: string;
-      pendingOrders: number;
-      pendingOrdersChange: string;
-      recentProducts: Array<{
-        id: string;
-        name: string;
-        status: string;
-        date: string;
-      }>;
-    }>('/products/dashboard/stats', {
-      method: 'GET',
-      token,
-    });
-  }
-
-  async getAnalytics(period: string, token: string) {
-    return this.request<{
-      revenue: {
-        total: number;
-        change: number;
-        chart: Array<{ date: string; value: number }>;
-      };
-      orders: {
-        total: number;
-        change: number;
-        chart: Array<{ date: string; value: number }>;
-      };
-      products: {
-        total: number;
-        sold: number;
-        change: number;
-      };
-      customers: {
-        total: number;
-        new: number;
-        change: number;
-      };
-      topProducts: Array<{
-        id: string;
-        name: string;
-        sales: number;
-        revenue: number;
-        orders: number;
-        change: number;
-      }>;
-      categories: Array<{
-        name: string;
-        revenue: number;
-        orders: number;
-        percentage: number;
-      }>;
-    }>(`/analytics?period=${encodeURIComponent(period)}`, {
-      method: 'GET',
-      token,
-    });
-  }
-
   // Order endpoints
   async createOrder(orderData: any, token: string) {
     return this.request<any>('/orders', {
@@ -270,23 +180,6 @@ class ApiService {
     });
   }
 
-  async updateOrderStatus(id: string, status: string, token: string) {
-    return this.request<any>(`/orders/${id}/status`, {
-      method: 'PUT',
-      body: JSON.stringify({ status }),
-      token,
-    });
-  }
-
-  async getOrderStats(token: string, startDate?: string, endDate?: string) {
-    const params = new URLSearchParams();
-    if (startDate) params.append('startDate', startDate);
-    if (endDate) params.append('endDate', endDate);
-    return this.request<any>(`/orders/stats?${params.toString()}`, {
-      method: 'GET',
-      token,
-    });
-  }
 
   // Health check
   async healthCheck() {

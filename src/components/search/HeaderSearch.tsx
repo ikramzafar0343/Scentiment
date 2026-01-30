@@ -68,11 +68,12 @@ export function HeaderSearch() {
   return (
     <>
       <button
-        className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+        className="w-full h-full flex items-center justify-center"
         aria-label="Search"
         onClick={handleOpen}
+        type="button"
       >
-        <HiSearch className="w-5 h-5 text-black" />
+        <HiSearch className="w-4 h-4 text-black" />
       </button>
 
       <SearchOverlay

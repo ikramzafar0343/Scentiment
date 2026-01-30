@@ -5,7 +5,7 @@ import { Seo } from '@/components/seo/Seo';
 export function ProductNotFound() {
   return (
     <div className="page-surface">
-      <Seo title="Product not found — Scentiment" description="Product not found." canonicalPath="/products" />
+      <Seo title="Product not found — AROMAZUR" description="Product not found." canonicalPath="/products" />
       <PageContainer className="py-16">
         <div className="mx-auto max-w-xl text-center">
           <div className="ui-eyebrow">Product</div>

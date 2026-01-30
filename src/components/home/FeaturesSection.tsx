@@ -53,7 +53,7 @@ export function FeaturesSection() {
               <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/25 to-black/0" />
               <div className="relative flex h-full flex-col justify-end p-5">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/85">
-                  Scentiment
+                  AROMAZUR
                 </div>
                 <div className="mt-1 text-base font-semibold leading-tight text-white sm:text-[17px]">
                   {b.title}

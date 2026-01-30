@@ -1,14 +1,11 @@
 import { Hero } from '@/components/home/Hero';
-import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { CollectionsSliderSection } from '@/components/home/CollectionsSliderSection';
-import { FeaturesSection } from '@/components/home/FeaturesSection';
-import { UseCasesSection } from '@/components/home/UseCasesSection';
 import { FeaturedProductsSection } from '@/components/home/FeaturedProductsSection';
+import { FeaturesSection } from '@/components/home/FeaturesSection';
 import { SocialProofSection } from '@/components/home/SocialProofSection';
-import { StatsSection } from '@/components/home/StatsSection';
+import { UseCasesSection } from '@/components/home/UseCasesSection';
 import { CTASection } from '@/components/home/CTASection';
 import { FAQSection } from '@/components/home/FAQSection';
-import { GuaranteesBar } from '@/components/home/GuaranteesBar';
 import { StickyMobileCTA } from '@/components/ui/StickyMobileCTA';
 import { useCatalogProducts } from '@/hooks/useCatalog';
 import { Seo } from '@/components/seo/Seo';
@@ -20,28 +17,41 @@ export function Home() {
   return (
     <div className="page-surface relative min-h-screen">
       <Seo
-        title="Scentiment — Premium Home Fragrance & Diffuser Oils"
+        title="AROMAZUR — Les Parfums de la Côte d'Azur"
         description="Transform your space with premium home fragrance. Discover luxury diffusers, hotel-inspired oils, designer scents, and curated collections. Fast shipping, clean ingredients, expert support."
         canonicalPath="/"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'Organization',
-          name: 'Scentiment',
+          name: 'AROMAZUR',
           url: '/',
           sameAs: []
         }}
       />
+      {/* 1. Hero Section */}
       <Hero />
-      <HowItWorksSection />
+      
+      {/* 2. Shop by Collection Section */}
       <CollectionsSliderSection />
-      <FeaturesSection />
-      <UseCasesSection />
+      
+      {/* 3. Best Seller Section & New Arrival */}
       <FeaturedProductsSection products={featured} />
-      <GuaranteesBar />
+      
+      {/* 4. What AROMAZUR Makes Different */}
+      <FeaturesSection />
+      
+      {/* 5. What Our Customer Says */}
       <SocialProofSection />
-      <StatsSection />
+      
+      {/* 6. Perfect for Every Space */}
+      <UseCasesSection />
+      
+      {/* 7. Newsletter or Subscription */}
       <CTASection />
+      
+      {/* 8. FAQ */}
       <FAQSection />
+      
       <StickyMobileCTA />
     </div>
   );

@@ -12,6 +12,10 @@ export const catalogService = {
       // Try to fetch from API with optional cache busting
       // Note: getProducts signature is (page = 1, limit = 100, token?: string, cacheBust = false)
       const products = await apiService.getProducts(1, 100, undefined, forceRefresh);
+
+      if (Array.isArray(products) && products.length === 0) {
+        throw new Error('Catalog is temporarily unavailable');
+      }
       
       // Transform API products to CatalogProduct format
       return products.map((product: any) => ({

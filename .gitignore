@@ -7,11 +7,28 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Frontend
+frontend/node_modules
+frontend/dist
+frontend/dist-ssr
+frontend/*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.production.local
+frontend/.env.development.local
+
+# Backend
+backend/node_modules
+backend/dist
+backend/.env
+
+# Root level (legacy - can be removed after cleanup)
 node_modules
 dist
 dist-ssr
 *.local
-
+src
+public
 
 # Editor directories and files
 .vscode/*
@@ -23,3 +40,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Build artifacts
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+tsconfig.node.tsbuildinfo
+
+# Stats
+stats.html

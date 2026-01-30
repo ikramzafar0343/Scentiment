@@ -50,23 +50,28 @@ A modern full-stack e-commerce application for luxury home fragrances and perfum
 
 ### Frontend Setup
 
-1. **Install dependencies**
+1. **Navigate to frontend directory**
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. **Create environment file** (optional for local dev)
+3. **Create environment file** (optional for local dev)
    ```bash
-   # Create .env file in root directory
+   # Create .env file in frontend directory
    VITE_API_BASE_URL=http://localhost:3000/api/v1
    ```
 
-3. **Start development server**
+4. **Start development server**
    ```bash
    npm run dev
    ```
 
-4. **Build for production**
+5. **Build for production**
    ```bash
    npm run build
    ```
@@ -223,8 +228,8 @@ The `render.yaml` file configures:
 
 - **Frontend Service:**
   - Type: Static Site
-  - Build: `npm install && npm run build`
-  - Publish: `./dist` directory
+  - Build: `cd frontend && npm install && npm run build`
+  - Publish: `./frontend/dist` directory
   - SPA Routing: All routes rewrite to `/index.html`
 
 ### Post-Deployment
@@ -245,28 +250,30 @@ The `render.yaml` file configures:
 
 ```
 aromazur/
-├── src/                    # Frontend source code
-│   ├── components/         # Reusable UI components
-│   ├── pages/              # Route components
-│   ├── features/           # Feature modules
-│   ├── hooks/              # Custom React hooks
-│   ├── services/           # API services
-│   ├── store/              # Zustand stores
-│   ├── configs/            # Configuration files
-│   └── lib/                # Utilities
+├── frontend/               # Frontend application
+│   ├── src/                # Frontend source code
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Route components
+│   │   ├── features/       # Feature modules
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── services/       # API services
+│   │   ├── store/          # Zustand stores
+│   │   ├── configs/        # Configuration files
+│   │   └── lib/            # Utilities
+│   ├── public/             # Static assets
+│   ├── dist/               # Frontend build output
+│   └── package.json
 ├── backend/                # Backend source code
 │   ├── src/
 │   │   ├── auth/           # Authentication module
-│   │   ├── products/        # Products module
+│   │   ├── products/       # Products module
 │   │   ├── orders/         # Orders module
 │   │   ├── analytics/      # Analytics module
 │   │   ├── payments/       # Payment processing
 │   │   └── main.ts         # Application entry
 │   └── package.json
-├── public/                 # Static assets
-├── dist/                  # Frontend build output
-├── render.yaml            # Render deployment config
-└── README.md              # This file
+├── render.yaml             # Render deployment config
+└── README.md               # This file
 ```
 
 ## 🔧 Environment Variables
